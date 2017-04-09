@@ -2,7 +2,6 @@
   "Core functions required by a Duct application."
   (:refer-clojure :exclude [compile])
   (:require [clojure.java.io :as io]
-            [duct.core.protocols :as p]
             [duct.core.env :as env]
             [integrant.core :as ig]
             [meta-merge.core :refer [meta-merge]]))
@@ -103,12 +102,3 @@
 (defmethod ig/init-key ::environment [_ env] env)
 
 (defmethod ig/init-key ::project-ns [_ ns] ns)
-
-(defn- log-form [logger level event data form]
-  `(p/-log ~logger ~level ~(str *ns*) ~*file* ~(:line (meta form)) ~event ~data))
-
-(defmacro log
-  "Log an event and optional data structure at the supplied severity level
-  using a logger that implements the duct.core.protocols/Logger protocol."
-  ([logger level event]      (log-form logger level event nil &form))
-  ([logger level event data] (log-form logger level event data &form)))

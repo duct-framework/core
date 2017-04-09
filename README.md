@@ -1,8 +1,8 @@
 # Duct core
 
 The core of the next iteration of the [Duct][] framework. It extends
-the [Integrant][] micro-framework with support for modules, logging,
-asset compilation and environment variables.
+the [Integrant][] micro-framework with support for modules, asset
+compilation and environment variables.
 
 [duct]:      https://github.com/duct-framework/duct
 [integrant]: https://github.com/weavejester/integrant
