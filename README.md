@@ -23,7 +23,7 @@ resource:
          '[duct.core :as duct])
 
 (defn get-config []
-  (read-config (io/resource "example/config.edn")))
+  (duct/read-config (io/resource "example/config.edn")))
 ```
 
 Once we have a configuration, we have three options. The first option
