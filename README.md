@@ -11,7 +11,7 @@ compilation and environment variables.
 
 To install, add the following to your project `:dependencies`:
 
-    [duct/core "0.9.0-SNAPSHOT"]
+    [duct/core "0.1.0-SNAPSHOT"]
 
 ## Usage
 
