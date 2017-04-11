@@ -55,6 +55,10 @@ be used from the `-main` function:
   (duct/exec (get-config)))
 ```
 
+## Documentation
+
+* [API Docs](https://duct-framework.github.io/core/index.html)
+
 ## License
 
 Copyright © 2017 James Reeves
