@@ -8,5 +8,6 @@
                  [meta-merge "1.0.0"]]
   :plugins [[lein-codox "0.10.3"]]
   :codox {:output-path "codox"
+          :html {:namespace-list :flat}
           :source-uri
           "https://github.com/duct-framework/core/blob/{version}/{filepath}#L{line}"})
