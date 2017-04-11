@@ -2,7 +2,8 @@
   "Functions for pulling values from environment variables.")
 
 (defmulti coerce
-  "Coerce a value to the type referenced by a symbol."
+  "Coerce a value to the type referenced by a symbol. By default supports
+  `Int` and `Str`."
   (fn [x type] type))
 
 (defmethod coerce 'Int [x _]
@@ -13,13 +14,13 @@
 
 (defn env
   "Resolve an environment variable by name. Optionally accepts a type for
-  coercion, and a keyword option, :or, that provides a default value if the
+  coercion, and a keyword option, `:or`, that provides a default value if the
   environment variable is missing.
 
   The arguments may optionally be wrapped in a vector. This is to support
-  their use in duct.core/read.config. For example:
+  their use in [[duct.core/read-config]]. For example:
 
-   {:port #env [\"PORT\" Int :or 3000]}"
+      {:port #env [\"PORT\" Int :or 3000]}"
   ([name]
    (if (vector? name)
      (apply env name)

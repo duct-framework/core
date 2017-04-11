@@ -22,7 +22,7 @@
 
 (defn add-shutdown-hook
   "Set a function to be executed when the current process shuts down. The key
-  argument should be unique, and is used in remove-shutdown-hook."
+  argument should be unique, and is used in [[remove-shutdown-hook]]."
   [key func]
   (force init-shutdown-hook)
   (swap! hooks assoc key func))
@@ -33,13 +33,13 @@
   (swap! hooks dissoc key))
 
 (defn not-in?
-  "Return true if the map, m, does not contain a nested value identified by a
-  sequence of keys, ks."
+  "Return true if the map, `m`, does not contain a nested value identified by a
+  sequence of keys, `ks`."
   [m ks]
   (let [o (Object.)] (identical? (get-in m ks o) o)))
 
 (defn assoc-in-default
-  "Functionally the same as assoc-in, except that it will not overwrite any
+  "Functionally the same as `assoc-in`, except that it will not overwrite any
   existing value."
   [m ks default]
   (cond-> m (not-in? m ks) (assoc-in ks default)))
@@ -53,9 +53,14 @@
   sources are meta-merged together. Three additional data readers are
   supported:
 
-    #ref      - an Integrant reference to another key
-    #resource - a resource path string, see clojure.java.io/resource
-    #env      - an environment variable, see duct.core.env/env"
+  #ref
+  : an Integrant reference to another key
+  
+  #resource
+  : a resource path string, see clojure.java.io/resource
+  
+  #env
+  : an environment variable, see [[duct.core.env/env]]"
   ([source]
    (some->> source slurp (ig/read-string {:readers readers})))
   ([source & sources]
@@ -83,14 +88,14 @@
       (doto ig/load-namespaces)))
 
 (defn compile
-  "Prep then initiate all keys that derive from :duct/compiler."
+  "Prep then initiate all keys that derive from `:duct/compiler`."
   [config]
   (ig/init (prep config) [:duct/compiler]))
 
 (defn exec
   "Prep then initiate a configuration, excluding keys that derive from
-  :duct/compiler, and then block indefinitely. This function should be called
-  from -main when a standalone application is required."
+  `:duct/compiler`, and then block indefinitely. This function should be called
+  from `-main` when a standalone application is required."
   [config]
   (let [system (-> config prep (dissoc-derived :duct/compiler) ig/init)]
     (add-shutdown-hook ::exec #(ig/halt! system))
