@@ -1,6 +1,7 @@
 (ns duct.core-test
   (:require [clojure.test :refer :all]
-            [duct.core :as core]))
+            [duct.core :as core]
+            [integrant.core :as ig]))
 
 (deftest test-add-shutdown-hook
   (let [f #(identity true)
@@ -25,3 +26,16 @@
     {::aa 1}        {::a 2}                 {::aa 2}
     {::aa 1 ::ab 2} {::a 3}                 {::aa 3 ::ab 3}
     {::aa {:x 1}}   {::a {:y 2}}            {::aa {:x 1 :y 2}}))
+
+(deftest test-modules-keyword
+  (let [m (ig/init {::core/modules [(partial * 2) (partial + 3)]})
+        f (::core/modules m)]
+    (is (= (f 7) 17))))
+
+(deftest test-environment-keyword
+  (let [m {::core/environment :development}]
+    (is (= m (ig/init m)))))
+
+(deftest test-project-ns-keyword
+  (let [m {::core/project-ns 'foo}]
+    (is (= m (ig/init m)))))
