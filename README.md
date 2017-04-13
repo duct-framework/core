@@ -1,5 +1,7 @@
 # Duct core
 
+[![Build Status](https://travis-ci.org/duct-framework/core.svg?branch=master)](https://travis-ci.org/duct-framework/core)
+
 The core of the next iteration of the [Duct][] framework. It extends
 the [Integrant][] micro-framework with support for modules, asset
 compilation and environment variables.
