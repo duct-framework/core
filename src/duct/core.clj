@@ -50,18 +50,6 @@
   ([a b & more]
    (reduce merge-configs (merge-configs a b) more)))
 
-(defn not-in?
-  "Return true if the map, `m`, does not contain a nested value identified by a
-  sequence of keys, `ks`."
-  [m ks]
-  (let [o (Object.)] (identical? (get-in m ks o) o)))
-
-(defn assoc-in-default
-  "Functionally the same as `assoc-in`, except that it will not overwrite any
-  existing value."
-  [m ks default]
-  (cond-> m (not-in? m ks) (assoc-in ks default)))
-
 (def ^:private readers
   {'resource io/resource
    'env      env/env})
