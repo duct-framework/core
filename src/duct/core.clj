@@ -56,8 +56,8 @@
 
 (defn read-config
   "Read an edn configuration from one or more slurpable sources. Multiple
-  sources are meta-merged together. Three additional data readers are
-  supported:
+  sources are merged together with merge-configs. Three additional data readers
+  are supported:
 
   #ref
   : an Integrant reference to another key
@@ -70,7 +70,7 @@
   ([source]
    (some->> source slurp (ig/read-string {:readers readers})))
   ([source & sources]
-   (apply meta-merge (read-config source) (map read-config sources))))
+   (apply merge-configs (read-config source) (map read-config sources))))
 
 (defn- apply-modules [config]
   (if (contains? config ::modules)
