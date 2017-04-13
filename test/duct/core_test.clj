@@ -19,13 +19,16 @@
 
 (deftest test-merge-configs
   (are [a b c] (= (core/merge-configs a b) c)
-    {::a 1}         {::a 2}                 {::a 2}
-    {::a {:x 1}}    {::a {:y 2}}            {::a {:x 1 :y 2}}
-    {::a {:x 1}}    {::a ^:displace {:x 2}} {::a {:x 1}}
-    {}              {::a ^:displace {:y 2}} {::a {:y 2}}
-    {::aa 1}        {::a 2}                 {::aa 2}
-    {::aa 1 ::ab 2} {::a 3}                 {::aa 3 ::ab 3}
-    {::aa {:x 1}}   {::a {:y 2}}            {::aa {:x 1 :y 2}}))
+    {::a 1}         {::a 2}                   {::a 2}
+    {::a {:x 1}}    {::a {:y 2}}              {::a {:x 1 :y 2}}
+    {::a {:x 1}}    {::a ^:displace {:x 2}}   {::a {:x 1}}
+    {}              {::a ^:displace {:y 2}}   {::a {:y 2}}
+    {::aa 1}        {::a 2}                   {::aa 2}
+    {::aa 1 ::ab 2} {::a 3}                   {::aa 3 ::ab 3}
+    {::aa {:x 1}}   {::a {:y 2}}              {::aa {:x 1 :y 2}}
+    {::a 1}         {::aa 2}                  {::aa 2}
+    {::a {:x 1}}    {::aa {:y 2}}             {::aa {:x 1 :y 2}}
+    {::a {:x 1}}    {::aa {:y 2} ::ab {:z 3}} {::aa {:x 1 :y 2} ::ab {:x 1 :z 3}}))
 
 (deftest test-modules-keyword
   (let [m (ig/init {::core/modules [(partial * 2) (partial + 3)]})

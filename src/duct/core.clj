@@ -43,10 +43,11 @@
 
 (defn merge-configs
   "Intelligently merge multiple configurations. Uses meta-merge and will merge
-  configurations in order from left to right. Top-level keys are merged into
-  their descendants, if they exist."
+  configurations in order from left to right. Generic top-level keys are merged
+  into more specific descendants, if the descendants exist."
   ([a b]
-   (meta-merge a (expand-ancestor-keys b a)))
+   (meta-merge (expand-ancestor-keys a b)
+               (expand-ancestor-keys b a)))
   ([a b & more]
    (reduce merge-configs (merge-configs a b) more)))
 
