@@ -32,6 +32,24 @@
   [key]
   (swap! hooks dissoc key))
 
+(defn- expand-ancestor-keys [config base]
+  (reduce-kv
+   (fn [m k v]
+     (if-let [ks (seq (keys (ig/find-derived base k)))]
+       (reduce #(assoc %1 %2 v) m ks)
+       (assoc m k v)))
+   {}
+   config))
+
+(defn merge-configs
+  "Intelligently merge multiple configurations. Uses meta-merge and will merge
+  configurations in order from left to right. Top-level keys are merged into
+  their descendants, if they exist."
+  ([a b]
+   (meta-merge a (expand-ancestor-keys b a)))
+  ([a b & more]
+   (reduce merge-configs (merge-configs a b) more)))
+
 (defn not-in?
   "Return true if the map, `m`, does not contain a nested value identified by a
   sequence of keys, `ks`."

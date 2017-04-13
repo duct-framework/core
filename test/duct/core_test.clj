@@ -11,3 +11,17 @@
   (core/add-shutdown-hook ::foo #(identity true))
   (let [hooks (core/remove-shutdown-hook ::foo)]
     (is (nil? (::foo hooks)))))
+
+(derive ::aa ::a)
+(derive ::ab ::a)
+(derive ::ab ::b)
+
+(deftest test-merge-configs
+  (are [a b c] (= (core/merge-configs a b) c)
+    {::a 1}         {::a 2}                 {::a 2}
+    {::a {:x 1}}    {::a {:y 2}}            {::a {:x 1 :y 2}}
+    {::a {:x 1}}    {::a ^:displace {:x 2}} {::a {:x 1}}
+    {}              {::a ^:displace {:y 2}} {::a {:y 2}}
+    {::aa 1}        {::a 2}                 {::aa 2}
+    {::aa 1 ::ab 2} {::a 3}                 {::aa 3 ::ab 3}
+    {::aa {:x 1}}   {::a {:y 2}}            {::aa {:x 1 :y 2}}))
