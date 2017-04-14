@@ -17,24 +17,12 @@
 (defn- replace? [obj]
   (-> obj meta* :replace))
 
-(defn- top-displace? [obj]
-  (-> obj meta* :top-displace))
-
 (defn- different-priority? [left right]
-  (boolean
-   (or (some (some-fn nil? displace? replace?) [left right])
-       (top-displace? left))))
-
-(defn- remove-top-displace [obj]
-  (if-not (top-displace? obj)
-    obj
-    (vary-meta obj dissoc :top-displace)))
+  (boolean (some (some-fn nil? displace? replace?) [left right])))
 
 (defn- pick-prioritized [left right]
   (cond (nil? left) right
-        (nil? right) (remove-top-displace left)
-
-        (top-displace? left) right
+        (nil? right) left
 
         (and (displace? left)   ;; Pick the rightmost
              (displace? right)) ;; if both are marked as displaceable
