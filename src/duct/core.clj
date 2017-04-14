@@ -3,8 +3,8 @@
   (:refer-clojure :exclude [compile])
   (:require [clojure.java.io :as io]
             [duct.core.env :as env]
-            [integrant.core :as ig]
-            [meta-merge.core :refer [meta-merge]]))
+            [duct.core.merge :as merge]
+            [integrant.core :as ig]))
 
 (def target-path
   "A path to place generated files in. Typically used by compilers. Can be set
@@ -46,8 +46,8 @@
   configurations in order from left to right. Generic top-level keys are merged
   into more specific descendants, if the descendants exist."
   ([a b]
-   (meta-merge (expand-ancestor-keys a b)
-               (expand-ancestor-keys b a)))
+   (merge/meta-merge (expand-ancestor-keys a b)
+                     (expand-ancestor-keys b a)))
   ([a b & more]
    (reduce merge-configs (merge-configs a b) more)))
 
