@@ -1,40 +1,26 @@
 (ns duct.core.merge
   (:require [clojure.set :as set]))
 
-(defn- meta*
-  "Returns the metadata of an object, or nil if the object cannot hold
-  metadata."
-  [obj]
+(defn- meta* [obj]
   (if (instance? clojure.lang.IObj obj)
     (meta obj)
     nil))
 
-(defn- with-meta*
-  "Returns an object of the same type and value as obj, with map m as its
-  metadata if the object can hold metadata."
-  [obj m]
+(defn- with-meta* [obj m]
   (if (instance? clojure.lang.IObj obj)
     (with-meta obj m)
     obj))
 
-(defn- displace?
-  "Returns true if the object is marked as displaceable"
-  [obj]
+(defn- displace? [obj]
   (-> obj meta* :displace))
 
-(defn- replace?
-  "Returns true if the object is marked as replaceable"
-  [obj]
+(defn- replace? [obj]
   (-> obj meta* :replace))
 
-(defn- top-displace?
-  "Returns true if the object is marked as top-displaceable"
-  [obj]
+(defn- top-displace? [obj]
   (-> obj meta* :top-displace))
 
-(defn- different-priority?
-  "Returns true if either left has a higher priority than right or vice versa."
-  [left right]
+(defn- different-priority? [left right]
   (boolean
    (or (some (some-fn nil? displace? replace?) [left right])
        (top-displace? left))))
@@ -44,10 +30,7 @@
     obj
     (vary-meta obj dissoc :top-displace)))
 
-(defn- pick-prioritized
-  "Picks the highest prioritized element of left and right and merge their
-  metadata."
-  [left right]
+(defn- pick-prioritized [left right]
   (cond (nil? left) right
         (nil? right) (remove-top-displace left)
 
