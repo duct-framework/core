@@ -31,7 +31,9 @@
     {::a {:x 1}}    {::aa {:y 2}}                 {::aa {:x 1 :y 2}}
     {::a {:x 1}}    {::aa {:y 2} ::ab {:z 3}}     {::aa {:x 1 :y 2} ::ab {:x 1 :z 3}}
     {::a 1}         {::a (merge/displace 2)}      {::a 1}
-    {::a {:x 1}}    {::a {:x (merge/displace 2)}} {::a {:x 1}}))
+    {::a {:x 1}}    {::a {:x (merge/displace 2)}} {::a {:x 1}}
+    {::a [:x :y]}   {::a [:y :z]}                 {::a [:x :y :y :z]}
+    {::a [:x :y]}   {::a ^:distinct [:y :z]}      {::a [:x :y :z]}))
 
 (deftest test-modules-keyword
   (let [m (ig/init {::core/modules [(partial * 2) (partial + 3)]})

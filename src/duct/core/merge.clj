@@ -1,5 +1,5 @@
 (ns duct.core.merge
-  (:refer-clojure :exclude [replace])
+  (:refer-clojure :exclude [replace distinct?])
   (:require [clojure.set :as set]
             [clojure.walk :as walk]
             [duct.core.merge :as merge]
@@ -71,6 +71,19 @@
       (merge (-> right meta* (dissoc :displace))
              (-> left meta* (dissoc :replace))))))
 
+(defn- prepend? [obj]
+  (-> obj meta :prepend))
+
+(defn- distinct? [obj]
+  (-> obj meta :distinct))
+
+(defn- meta-concat [left right]
+  (let [combined (concat left right)]
+    (into (empty left)
+          (if (or (distinct? left) (distinct? right))
+            (distinct combined)
+            combined))))
+
 (defn meta-merge
   "Recursively merge values based on the information in their metadata."
   [left right]
@@ -85,11 +98,9 @@
     (set/union right left)
 
     (and (coll? left) (coll? right))
-    (if (or (-> left meta :prepend)
-            (-> right meta :prepend))
-      (-> (into (empty left) (concat right left))
-          (with-meta (merge (meta left)
-                            (select-keys (meta right) [:displace]))))
-      (into (empty left) (concat left right)))
+    (if (or (prepend? left) (prepend? right))
+      (-> (meta-concat right left)
+          (with-meta (merge (meta left) (select-keys (meta right) [:displace]))))
+      (meta-concat left right))
 
     :else right))
