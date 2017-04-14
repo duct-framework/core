@@ -48,26 +48,22 @@
 
 (defn meta-merge
   "Recursively merge values based on the information in their metadata."
-  ([] {})
-  ([left] left)
-  ([left right]
-   (cond (different-priority? left right)
-         (pick-prioritized left right)
+  [left right]
+  (cond (different-priority? left right)
+        (pick-prioritized left right)
 
-         (and (map? left) (map? right))
-         (merge-with meta-merge left right)
+        (and (map? left) (map? right))
+        (merge-with meta-merge left right)
 
-         (and (set? left) (set? right))
-         (set/union right left)
+        (and (set? left) (set? right))
+        (set/union right left)
 
-         (and (coll? left) (coll? right))
-         (if (or (-> left meta :prepend)
-                 (-> right meta :prepend))
-           (-> (into (empty left) (concat right left))
-             (with-meta (merge (meta left)
-                               (select-keys (meta right) [:displace]))))
-           (into (empty left) (concat left right)))
+        (and (coll? left) (coll? right))
+        (if (or (-> left meta :prepend)
+                (-> right meta :prepend))
+          (-> (into (empty left) (concat right left))
+              (with-meta (merge (meta left)
+                                (select-keys (meta right) [:displace]))))
+          (into (empty left) (concat left right)))
 
-         :else right))
-  ([left right & more]
-   (reduce meta-merge left (cons right more))))
+        :else right))
