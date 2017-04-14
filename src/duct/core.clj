@@ -41,15 +41,16 @@
    {}
    config))
 
+(defn- merge-configs* [a b]
+  (merge/meta-merge (expand-ancestor-keys a b)
+                    (expand-ancestor-keys b a)))
+
 (defn merge-configs
   "Intelligently merge multiple configurations. Uses meta-merge and will merge
   configurations in order from left to right. Generic top-level keys are merged
   into more specific descendants, if the descendants exist."
-  ([a b]
-   (merge/meta-merge (expand-ancestor-keys a b)
-                     (expand-ancestor-keys b a)))
-  ([a b & more]
-   (reduce merge-configs (merge-configs a b) more)))
+  [& configs]
+  (merge/unwrap-all (reduce merge-configs* {} configs)))
 
 (def ^:private readers
   {'resource io/resource
