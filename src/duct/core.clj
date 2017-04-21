@@ -80,12 +80,6 @@
       (modules config))
     config))
 
-(defn- derived-keys [config k]
-  (map key (ig/find-derived config k)))
-
-(defn- dissoc-derived [config key]
-  (apply dissoc config (derived-keys config key)))
-
 (defn prep
   "Prep a configuration, ready to be initiated. Key namespaces are loaded,
   and modules are applied."
@@ -99,6 +93,12 @@
   "Prep then initiate all keys that derive from `:duct/compiler`."
   [config]
   (ig/init (prep config) [:duct/compiler]))
+
+(defn- derived-keys [config k]
+  (map key (ig/find-derived config k)))
+
+(defn- dissoc-derived [config key]
+  (apply dissoc config (derived-keys config key)))
 
 (defn exec
   "Prep then initiate a configuration, excluding keys that derive from
