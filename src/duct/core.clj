@@ -1,7 +1,8 @@
 (ns duct.core
   "Core functions required by a Duct application."
   (:refer-clojure :exclude [compile])
-  (:require [clojure.java.io :as io]
+  (:require [com.stuartsierra.dependency :as dep]
+            [clojure.java.io :as io]
             [duct.core.env :as env]
             [duct.core.merge :as merge]
             [integrant.core :as ig]))
@@ -75,10 +76,12 @@
    (apply merge-configs (read-config source) (map read-config sources))))
 
 (defn- apply-modules [config]
-  (if (contains? config ::modules)
-    (let [modules (::modules (ig/init config [::modules]))]
-      (modules config))
-    config))
+  (let [modules (ig/init config [:duct/module])
+        graph   (ig/dependency-graph modules)]
+    (->> (keys modules)
+         (sort (dep/topo-comparator graph))
+         (map (comp :fn modules))
+         (reduce #(%2 %1) config))))
 
 (defn prep
   "Prep a configuration, ready to be initiated. Key namespaces are loaded,
@@ -108,9 +111,6 @@
   (let [system (-> config prep (dissoc-derived :duct/compiler) ig/init)]
     (add-shutdown-hook ::exec #(ig/halt! system))
     (.. Thread currentThread join)))
-
-(defmethod ig/init-key ::modules [_ modules]
-  (apply comp (reverse modules)))
 
 (defmethod ig/init-key ::environment [_ env] env)
 

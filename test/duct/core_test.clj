@@ -35,10 +35,21 @@
     {::a [:x :y]}   {::a [:y :z]}                 {::a [:x :y :y :z]}
     {::a [:x :y]}   {::a ^:distinct [:y :z]}      {::a [:x :y :z]}))
 
-(deftest test-modules-keyword
-  (let [m (ig/init {::core/modules [(partial * 2) (partial + 3)]})
-        f (::core/modules m)]
-    (is (= (f 7) 17))))
+(derive ::mod1 :duct/module)
+(derive ::mod2 :duct/module)
+
+(defmethod ig/init-key ::x [_ x] x)
+
+(defmethod ig/init-key ::mod1 [_ _]
+  {:requires #{}, :fn (fn [cfg] (update cfg ::x inc))})
+
+(defmethod ig/init-key ::mod2 [_ _]
+  {:requires #{(ig/ref ::mod1)} :fn (fn [cfg] (update cfg ::x * 2))})
+
+(deftest test-prep
+  (let [config {::x 3, ::mod1 {}, ::mod2 {}}]
+    (is (= (core/prep config)
+           {::x 8, ::mod1 {}, ::mod2 {}}))))
 
 (deftest test-environment-keyword
   (let [m {::core/environment :development}]
