@@ -3,9 +3,12 @@
   (:refer-clojure :exclude [compile])
   (:require [com.stuartsierra.dependency :as dep]
             [clojure.java.io :as io]
+            [clojure.set :as set]
+            [clojure.string :as str]
             [duct.core.env :as env]
             [duct.core.merge :as merge]
-            [integrant.core :as ig]))
+            [integrant.core :as ig]
+            [medley.core :as m]))
 
 (def target-path
   "A path to place generated files in. Typically used by compilers. Can be set
@@ -79,14 +82,17 @@
   (every? #(seq (ig/find-derived config %)) requires))
 
 (defn- find-applicable-module [config modules]
-  (first (filter (partial can-apply-module? config) modules)))
+  (m/find-first (partial can-apply-module? config) modules))
 
-(defn- no-applicable-module-exception [config applied remaining]
-  (ex-info "Cannot apply modules because no module matches requirements"
-           {:reason    ::no-applicable-module
-            :config    config
-            :applied   applied
-            :remaining remaining}))
+(defn- missing-requirements-exception [config modules applied]
+  (let [missing (m/map-vals #(set/difference (set (:req %)) (set (keys config))) modules)]
+    (ex-info (str "Missing module requirements: "
+                  (str/join ", " (for [[k v] missing] (str k " requires " (sort v)))))
+             {:reason    ::missing-requirements
+              :missing   missing
+              :config    config
+              :applied   applied
+              :remaining (keys modules)})))
 
 (defn- apply-modules [config]
   (loop [modules (into (sorted-map) (ig/init config [:duct/module]))
@@ -95,7 +101,7 @@
     (if (seq modules)
       (if-let [[k m] (find-applicable-module config modules)]
         (recur (dissoc modules k) (conj applied k) ((:fn m) config))
-        (throw (no-applicable-module-exception config applied (keys modules))))
+        (throw (missing-requirements-exception config modules applied)))
       config)))
 
 (defn prep

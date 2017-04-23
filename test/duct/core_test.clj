@@ -53,9 +53,20 @@
   {:req #{::x ::y}, :fn (fn [cfg] (assoc cfg ::z (+ (::xx cfg) (::y cfg))))})
 
 (deftest test-prep
-  (let [config {::mod1 {}, ::mod2 {}, ::mod3 {}}]
-    (is (= (core/prep config)
-           (merge config {::xx 1, ::y 2, ::z 3})))))
+  (testing "valid modules"
+    (let [config {::mod1 {}, ::mod2 {}, ::mod3 {}}]
+      (is (= (core/prep config)
+             (merge config {::xx 1, ::y 2, ::z 3})))))
+
+  (testing "missing requirements"
+    (let [config {::mod2 {}, ::mod3 {}}]
+      (is (thrown-with-msg?
+           clojure.lang.ExceptionInfo
+           (re-pattern
+            (str "Missing module requirements: "
+                 ::mod2 " requires \\(" ::xx "\\), "
+                 ::mod3 " requires \\(" ::x " " ::y "\\)"))
+           (core/prep config))))))
 
 (deftest test-environment-keyword
   (let [m {::core/environment :development}]
