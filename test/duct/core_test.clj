@@ -44,10 +44,10 @@
 (defmethod ig/init-key ::x [_ x] x)
 
 (defmethod ig/init-key ::mod1 [_ _]
-  {:provides #{::xx}, :fn (fn [cfg] (assoc cfg ::xx 1))})
+  {:fn (fn [cfg] (assoc cfg ::xx 1))})
 
 (defmethod ig/init-key ::mod2 [_ _]
-  {:provides #{::y}, :requires #{::xx}, :fn (fn [cfg] (assoc cfg ::y (inc (::xx cfg))))})
+  {:requires #{::xx}, :fn (fn [cfg] (assoc cfg ::y (inc (::xx cfg))))})
 
 (defmethod ig/init-key ::mod3 [_ _]
   {:requires #{::x ::y}, :fn (fn [cfg] (assoc cfg ::z (+ (::xx cfg) (::y cfg))))})

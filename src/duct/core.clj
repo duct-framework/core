@@ -75,28 +75,28 @@
   ([source & sources]
    (apply merge-configs (read-config source) (map read-config sources))))
 
-(defn- derived-provides [provides]
-  (concat provides (mapcat ancestors provides)))
+(defn- can-apply-module? [config [_ {:keys [requires]}]]
+  (every? #(seq (ig/find-derived config %)) requires))
 
-(defn- add-module-provides [graph key {:keys [provides]}]
-  (reduce #(dep/depend %1 %2 key) graph (derived-provides provides)))
+(defn- find-applicable-module [config modules]
+  (first (filter (partial can-apply-module? config) modules)))
 
-(defn- add-module-requires [graph key {:keys [requires]}]
-  (reduce #(dep/depend %1 key %2) graph requires))
-
-(defn- add-module-dependency [graph key module]
-  (-> graph (add-module-provides key module) (add-module-requires key module)))
-
-(defn- module-graph [modules]
-  (reduce-kv add-module-dependency (dep/graph) modules))
+(defn- no-applicable-module-exception [config applied remaining]
+  (ex-info "Cannot apply modules because no module matches requirements"
+           {:reason    ::no-applicable-module
+            :config    config
+            :applied   applied
+            :remaining remaining}))
 
 (defn- apply-modules [config]
-  (let [modules (ig/init config [:duct/module])
-        graph   (module-graph modules)]
-    (->> (keys modules)
-         (sort (dep/topo-comparator graph))
-         (map (comp :fn modules))
-         (reduce #(%2 %1) config))))
+  (loop [modules (into (sorted-map) (ig/init config [:duct/module]))
+         applied []
+         config  config]
+    (if (seq modules)
+      (if-let [[k m] (find-applicable-module config modules)]
+        (recur (dissoc modules k) (conj applied k) ((:fn m) config))
+        (throw (no-applicable-module-exception config applied (keys modules))))
+      config)))
 
 (defn prep
   "Prep a configuration, ready to be initiated. Key namespaces are loaded,
