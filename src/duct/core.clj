@@ -75,7 +75,7 @@
   ([source & sources]
    (apply merge-configs (read-config source) (map read-config sources))))
 
-(defn- can-apply-module? [config [_ {:keys [requires]}]]
+(defn- can-apply-module? [config [_ {requires :req}]]
   (every? #(seq (ig/find-derived config %)) requires))
 
 (defn- find-applicable-module [config modules]

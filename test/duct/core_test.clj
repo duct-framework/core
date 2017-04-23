@@ -47,10 +47,10 @@
   {:fn (fn [cfg] (assoc cfg ::xx 1))})
 
 (defmethod ig/init-key ::mod2 [_ _]
-  {:requires #{::xx}, :fn (fn [cfg] (assoc cfg ::y (inc (::xx cfg))))})
+  {:req #{::xx}, :fn (fn [cfg] (assoc cfg ::y (inc (::xx cfg))))})
 
 (defmethod ig/init-key ::mod3 [_ _]
-  {:requires #{::x ::y}, :fn (fn [cfg] (assoc cfg ::z (+ (::xx cfg) (::y cfg))))})
+  {:req #{::x ::y}, :fn (fn [cfg] (assoc cfg ::z (+ (::xx cfg) (::y cfg))))})
 
 (deftest test-prep
   (let [config {::mod1 {}, ::mod2 {}, ::mod3 {}}]
