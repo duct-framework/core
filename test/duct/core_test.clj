@@ -35,21 +35,27 @@
     {::a [:x :y]}   {::a [:y :z]}                 {::a [:x :y :y :z]}
     {::a [:x :y]}   {::a ^:distinct [:y :z]}      {::a [:x :y :z]}))
 
+(derive ::xx ::x)
+
 (derive ::mod1 :duct/module)
 (derive ::mod2 :duct/module)
+(derive ::mod3 :duct/module)
 
 (defmethod ig/init-key ::x [_ x] x)
 
 (defmethod ig/init-key ::mod1 [_ _]
-  {:requires #{}, :fn (fn [cfg] (update cfg ::x inc))})
+  {:provides #{::xx}, :fn (fn [cfg] (assoc cfg ::xx 1))})
 
 (defmethod ig/init-key ::mod2 [_ _]
-  {:requires #{(ig/ref ::mod1)} :fn (fn [cfg] (update cfg ::x * 2))})
+  {:provides #{::y}, :requires #{::xx}, :fn (fn [cfg] (assoc cfg ::y (inc (::xx cfg))))})
+
+(defmethod ig/init-key ::mod3 [_ _]
+  {:requires #{::x ::y}, :fn (fn [cfg] (assoc cfg ::z (+ (::xx cfg) (::y cfg))))})
 
 (deftest test-prep
-  (let [config {::x 3, ::mod1 {}, ::mod2 {}}]
+  (let [config {::mod1 {}, ::mod2 {}, ::mod3 {}}]
     (is (= (core/prep config)
-           {::x 8, ::mod1 {}, ::mod2 {}}))))
+           (merge config {::xx 1, ::y 2, ::z 3})))))
 
 (deftest test-environment-keyword
   (let [m {::core/environment :development}]

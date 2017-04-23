@@ -75,9 +75,24 @@
   ([source & sources]
    (apply merge-configs (read-config source) (map read-config sources))))
 
+(defn- derived-provides [provides]
+  (concat provides (mapcat ancestors provides)))
+
+(defn- add-module-provides [graph key {:keys [provides]}]
+  (reduce #(dep/depend %1 %2 key) graph (derived-provides provides)))
+
+(defn- add-module-requires [graph key {:keys [requires]}]
+  (reduce #(dep/depend %1 key %2) graph requires))
+
+(defn- add-module-dependency [graph key module]
+  (-> graph (add-module-provides key module) (add-module-requires key module)))
+
+(defn- module-graph [modules]
+  (reduce-kv add-module-dependency (dep/graph) modules))
+
 (defn- apply-modules [config]
   (let [modules (ig/init config [:duct/module])
-        graph   (ig/dependency-graph modules)]
+        graph   (module-graph modules)]
     (->> (keys modules)
          (sort (dep/topo-comparator graph))
          (map (comp :fn modules))
