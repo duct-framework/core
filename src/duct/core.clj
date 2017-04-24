@@ -57,8 +57,8 @@
   (merge/unwrap-all (reduce merge-configs* {} configs)))
 
 (def ^:private readers
-  {'resource io/resource
-   'env      env/env})
+  {'duct/resource io/resource
+   'duct/env      env/env})
 
 (defn read-config
   "Read an edn configuration from one or more slurpable sources. Multiple
@@ -68,10 +68,10 @@
   #ig/ref
   : an Integrant reference to another key
   
-  #resource
+  #duct/resource
   : a resource path string, see clojure.java.io/resource
   
-  #env
+  #duct/env
   : an environment variable, see [[duct.core.env/env]]"
   ([source]
    (some->> source slurp (ig/read-string {:readers readers})))
