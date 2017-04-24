@@ -5,7 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [integrant "0.4.0"]
-                 [medley "0.8.4"]]
+                 [medley "1.0.0"]]
   :plugins [[lein-codox "0.10.3"]]
   :codox {:output-path "codox"
           :html     {:namespace-list :flat}
