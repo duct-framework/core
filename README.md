@@ -30,7 +30,7 @@ resource:
 
 Once we have a configuration, we have three options. The first option
 is to `prep` the configuration, which will load in all relevant
-namespaces and apply all modules in the `:duct/modules` key.
+namespaces and apply all modules.
 
 This is ideally used with `integrant.repl`:
 
@@ -56,6 +56,62 @@ be used from the `-main` function:
 (defn -main []
   (duct/exec (get-config)))
 ```
+
+## Modules
+
+Modules are Integrant keywords that derive from `:duct/module`, and
+initiate into maps with two keys: `:req` and `:fn`. The `:req` key is
+optional, and should contain a collection of keys that are required to
+be present in the map. The `:fn` key is a pure function that
+transforms the configuration into a new configuration.
+
+The `:fn` **must** be pure, and **must never** remove top-level keys
+from the configuration. A module should add functionality to a
+configuration; it should not override or remove existing functionality
+supplied by the user.
+
+Here's an example module:
+
+```clojure
+(require '[integrant.core :as ig])
+
+(derive :duct.module/example :duct/module)
+
+(defmethod ig/init-key :duct.module/example [_ port]
+  {:req #{:duct.server.http/jetty}
+   :fn  (fn [config]
+          (assoc-in config [:duct.server.http/jetty :port] port))})
+```
+
+This above module updates the port number of the `:duct.server.http/jetty`
+key. Note that this key is a requirement; we need it to exist for the
+module to run. The module requirements are used for ordering modules,
+and for ensuring their basic pre-requisites are met.
+
+In the previous example we used `assoc-in`, but the `duct.core`
+namespace also has a `merge-configs` function we can use to achieve a
+similar result in a smarter way:
+
+```clojure
+(require '[duct.core.merge :as merge])
+
+(defmethod ig/init-key :duct.module/example [_ port]
+  {:req #{:duct.server/http}
+   :fn  (fn [config]
+          (duct/merge-configs
+           config
+           {:duct.server/http {:port (merge/displace port)}}))})
+```
+
+In this example we've changed the requirement from
+`:duct.server.http/jetty` to the more generic `:duct.server/http`,
+which the latter derives from. The `merge-configs` function is smart
+enough to merge `:duct.server/http` into a more specific derived key,
+if one exists.
+
+We've also added merge metadata using `merge/displace`. This tells
+`merge-configs` not to override the port if it already exists in the
+configuraton.
 
 ## Documentation
 
