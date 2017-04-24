@@ -65,7 +65,7 @@
   sources are merged together with merge-configs. Three additional data readers
   are supported:
 
-  #ref
+  #ig/ref
   : an Integrant reference to another key
   
   #resource
