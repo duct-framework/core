@@ -94,8 +94,13 @@
               :applied   applied
               :remaining (keys modules)})))
 
+(defn- init-modules [config]
+  (-> config
+      (ig/init [:duct/module])
+      (ig/find-derived :duct/module)))
+
 (defn- apply-modules [config]
-  (loop [modules (into (sorted-map) (ig/init config [:duct/module]))
+  (loop [modules (into (sorted-map) (init-modules config))
          applied []
          config  config]
     (if (seq modules)

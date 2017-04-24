@@ -66,7 +66,15 @@
             (str "Missing module requirements: "
                  ::mod2 " requires \\(" ::xx "\\), "
                  ::mod3 " requires \\(" ::x " " ::y "\\)"))
-           (core/prep config))))))
+           (core/prep config)))))
+
+  (testing "valid modules with dependencies"
+    (let [config {::mod1 {:x (ig/ref ::x)},
+                  ::mod2 {}
+                  ::mod3 {}
+                  ::xx 1}]
+      (is (= (core/prep config)
+             (merge config {::xx 1, ::y 2, ::z 3}))))))
 
 (deftest test-environment-keyword
   (let [m {::core/environment :development}]
