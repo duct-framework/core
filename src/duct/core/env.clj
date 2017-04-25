@@ -20,7 +20,7 @@
   The arguments may optionally be wrapped in a vector. This is to support
   their use in [[duct.core/read-config]]. For example:
 
-      {:port #env [\"PORT\" Int :or 3000]}"
+      {:port #duct/env [\"PORT\" Int :or 3000]}"
   ([name]
    (if (vector? name)
      (apply env name)
