@@ -13,7 +13,7 @@ compilation and environment variables.
 
 To install, add the following to your project `:dependencies`:
 
-    [duct/core "0.2.1"]
+    [duct/core "0.2.2"]
 
 ## Usage
 
