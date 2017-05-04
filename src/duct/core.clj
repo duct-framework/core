@@ -56,13 +56,21 @@
   [& configs]
   (merge/unwrap-all (reduce merge-configs* {} configs)))
 
+(declare read-config)
+
+(defn- import-resource [path]
+  (read-config (or (io/resource path)
+                   (io/resource (str path ".edn"))
+                   (io/resource (str path ".clj")))))
+
 (def ^:private readers
   {'duct/resource io/resource
-   'duct/env      env/env})
+   'duct/env      env/env
+   'duct/import   import-resource})
 
 (defn read-config
   "Read an edn configuration from one or more slurpable sources. Multiple
-  sources are merged together with merge-configs. Three additional data readers
+  sources are merged together with merge-configs. Four additional data readers
   are supported:
 
   #ig/ref
@@ -70,6 +78,9 @@
   
   #duct/resource
   : a resource path string, see clojure.java.io/resource
+
+  #duct/import
+  : import the named edn resource (the extension may be omitted)
   
   #duct/env
   : an environment variable, see [[duct.core.env/env]]"

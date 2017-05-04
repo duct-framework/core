@@ -2,7 +2,8 @@
   (:require [clojure.test :refer :all]
             [duct.core :as core]
             [duct.core.merge :as merge]
-            [integrant.core :as ig]))
+            [integrant.core :as ig]
+            [clojure.string :as str]))
 
 (deftest test-add-shutdown-hook
   (let [f #(identity true)
@@ -34,6 +35,17 @@
     {::a {:x 1}}    {::a {:x (merge/displace 2)}} {::a {:x 1}}
     {::a [:x :y]}   {::a [:y :z]}                 {::a [:x :y :y :z]}
     {::a [:x :y]}   {::a ^:distinct [:y :z]}      {::a [:x :y :z]}))
+
+(defn- str-stream [^String s]
+  (java.io.ByteArrayInputStream. (.getBytes s)))
+
+(deftest test-read-configs
+  (is (= (core/read-config (str-stream "{:a 1}"))
+         {:a 1}))
+  (is (= (core/read-config (str-stream "{:a #duct/env \"HOME\"}"))
+         {:a (System/getenv "HOME")}))
+  (is (= (core/read-config (str-stream "{:a #duct/import \"duct/import\"}"))
+         {:a {:b {:c 3}}})))
 
 (derive ::xx ::x)
 
