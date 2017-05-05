@@ -152,3 +152,6 @@
 (defmethod ig/init-key ::environment [_ env] env)
 
 (defmethod ig/init-key ::project-ns [_ ns] ns)
+
+(defmethod ig/init-key ::handler [_ {:keys [middleware router]}]
+  ((apply comp (reverse middleware)) router))
