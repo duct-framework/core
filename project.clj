@@ -8,6 +8,7 @@
                  [medley "1.0.0"]]
   :plugins [[lein-codox "0.10.3"]]
   :codox {:output-path "codox"
+          :project  {:name "Duct core"}
           :html     {:namespace-list :flat}
           :metadata {:doc/format :markdown}
           :source-uri
