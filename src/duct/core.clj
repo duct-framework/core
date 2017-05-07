@@ -58,10 +58,13 @@
 
 (declare read-config)
 
+(defn- config-resource [path]
+  (or (io/resource path)
+      (io/resource (str path ".edn"))
+      (io/resource (str path ".clj"))))
+
 (defn- import-resource [path]
-  (read-config (or (io/resource path)
-                   (io/resource (str path ".edn"))
-                   (io/resource (str path ".clj")))))
+  (read-config (config-resource path)))
 
 (def ^:private readers
   {'duct/resource io/resource
@@ -88,6 +91,13 @@
    (some->> source slurp (ig/read-string {:readers readers})))
   ([source & sources]
    (apply merge-configs (read-config source) (map read-config sources))))
+
+(defn- load-config-resource [path]
+  (read-config (config-resource path)))
+
+(defn- apply-includes [config]
+  (let [includes (mapv load-config-resource (::includes config))]
+    (apply merge-configs (conj includes config))))
 
 (defn- can-apply-module? [config [_ {requires :req}]]
   (every? #(seq (ig/find-derived config %)) requires))
@@ -122,9 +132,10 @@
 
 (defn prep
   "Prep a configuration, ready to be initiated. Key namespaces are loaded,
-  and modules are applied."
+  resources included, and modules applied."
   [config]
   (-> config
+      (apply-includes)
       (doto ig/load-namespaces)
       (apply-modules)
       (doto ig/load-namespaces)))
@@ -152,6 +163,8 @@
 (defmethod ig/init-key ::environment [_ env] env)
 
 (defmethod ig/init-key ::project-ns [_ ns] ns)
+
+(defmethod ig/init-key ::include [_ paths] paths)
 
 (defmethod ig/init-key ::handler [_ {:keys [middleware router]}]
   ((apply comp (reverse middleware)) router))

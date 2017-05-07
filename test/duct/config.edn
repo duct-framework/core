@@ -1,0 +1,2 @@
+{:duct.core-test/a {:x 1}
+ :duct.core-test/b {:y 2}}
