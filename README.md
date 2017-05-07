@@ -57,6 +57,30 @@ be used from the `-main` function:
   (duct/exec (get-config)))
 ```
 
+## Keys
+
+This library introduces four Integrant keys.
+
+`:duct.core/environment` specifies the environment of the
+configuration, and may be set to `:development` or `:production`. It
+does nothing on its own, but may be used by modules.
+
+`:duct.core/project-ns` specifies the base namespace of your
+project. This is often used by modules for determining where to put
+things. For example, public web resources are typically placed in the
+`resources/<project-ns>/public` directory.
+
+`:duct.core/include` specifies a vector of resource paths that contain
+configurations that will be merged into the base configuration
+map. Data in the base configuration always takes priority over the
+included resources. The file extension may be omitted from the
+resource paths.
+
+`:duct.core/handler` should be configured with a map with two keys:
+`:router`, which should be a Ring handler, and `:middleware`, which
+should be an ordered vector of middleware. The middleware is applied
+to the router to create a completed Ring handler.
+
 ## Modules
 
 Modules are Integrant keywords that derive from `:duct/module`, and
