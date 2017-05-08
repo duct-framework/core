@@ -1,3 +1,9 @@
+## 0.3.0 (2017-05-08)
+
+* **BREAKING CHANGE** Removed `#duct/import` tag
+* Added `:duct.core/include` key
+* Updated Clojure version to 1.9.0-alpha16
+
 ## 0.2.3 (2017-05-06)
 
 * Added `:duct.core/handler` key
