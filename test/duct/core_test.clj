@@ -54,11 +54,11 @@
 
 (deftest test-prep
   (testing "includes"
-    (let [config {::core/includes ["duct/config"]
+    (let [config {::core/include ["duct/config"]
                   ::b {:x 2}
                   ::c {:x 3}}]
       (is (= (core/prep config)
-             {::core/includes ["duct/config"]
+             {::core/include ["duct/config"]
                   ::a {:x 1}
                   ::b {:x 2, :y 2}
                   ::c {:x 3}}))))

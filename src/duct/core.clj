@@ -84,7 +84,7 @@
                    (io/resource (str path ".clj")))))
 
 (defn- apply-includes [config]
-  (let [includes (mapv load-config-resource (::includes config))]
+  (let [includes (mapv load-config-resource (::include config))]
     (apply merge-configs (conj includes config))))
 
 (defn- can-apply-module? [config [_ {requires :req}]]
