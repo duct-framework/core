@@ -1,3 +1,7 @@
+## 0.3.1 (2017-05-08)
+
+* Fixed typo in prepping `:duct.core/include` key
+
 ## 0.3.0 (2017-05-08)
 
 * **BREAKING CHANGE** Removed `#duct/import` tag
