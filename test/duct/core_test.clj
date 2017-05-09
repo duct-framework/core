@@ -58,10 +58,10 @@
                   ::b {:x 2}
                   ::c {:x 3}}]
       (is (= (core/prep config)
-             {::core/include ["duct/config"]
-                  ::a {:x 1}
-                  ::b {:x 2, :y 2}
-                  ::c {:x 3}}))))
+             {::core/include ["duct/included" "duct/config"]
+              ::a {:x 1}
+              ::b {:x 2, :y 2}
+              ::c {:x 3}}))))
 
   (testing "valid modules"
     (let [config {::mod1 {}, ::mod2 {}, ::mod3 {}}]

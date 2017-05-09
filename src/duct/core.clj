@@ -78,10 +78,15 @@
   ([source & sources]
    (apply merge-configs (read-config source) (map read-config sources))))
 
+(defn- config-resource [path]
+  (or (io/resource path)
+      (io/resource (str path ".edn"))
+      (io/resource (str path ".clj"))))
+
+(declare apply-includes)
+
 (defn- load-config-resource [path]
-  (read-config (or (io/resource path)
-                   (io/resource (str path ".edn"))
-                   (io/resource (str path ".clj")))))
+  (apply-includes (read-config (config-resource path))))
 
 (defn- apply-includes [config]
   (let [includes (mapv load-config-resource (::include config))]
