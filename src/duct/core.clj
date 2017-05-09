@@ -78,19 +78,21 @@
   ([source & sources]
    (apply merge-configs (read-config source) (map read-config sources))))
 
+(declare apply-includes)
+
 (defn- config-resource [path]
   (or (io/resource path)
       (io/resource (str path ".edn"))
       (io/resource (str path ".clj"))))
 
-(declare apply-includes)
+(defn- load-config-resource [path reader]
+  (-> (config-resource path) (reader) (apply-includes reader)))
 
-(defn- load-config-resource [path]
-  (apply-includes (read-config (config-resource path))))
+(defn- load-includes [config reader]
+  (mapv #(load-config-resource % reader) (::include config)))
 
-(defn- apply-includes [config]
-  (let [includes (mapv load-config-resource (::include config))]
-    (apply merge-configs (conj includes config))))
+(defn- apply-includes [config reader]
+  (apply merge-configs (conj (load-includes config reader) config)))
 
 (defn- can-apply-module? [config [_ {requires :req}]]
   (every? #(seq (ig/find-derived config %)) requires))
@@ -128,7 +130,7 @@
   resources included, and modules applied."
   [config]
   (-> config
-      (apply-includes)
+      (apply-includes (memoize read-config))
       (doto ig/load-namespaces)
       (apply-modules)
       (doto ig/load-namespaces)))
