@@ -1,3 +1,8 @@
+## 0.3.2 (2017-05-09)
+
+* Change `:duct.core/include` key to include configs recursively
+* Added caching to `:duct.core/include`
+
 ## 0.3.1 (2017-05-08)
 
 * Fixed typo in prepping `:duct.core/include` key
