@@ -2,7 +2,6 @@
   (:refer-clojure :exclude [replace distinct?])
   (:require [clojure.set :as set]
             [clojure.walk :as walk]
-            [duct.core.merge :as merge]
             [integrant.core :as ig]))
 
 (defrecord WrapMeta [val])
