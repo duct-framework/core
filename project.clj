@@ -5,7 +5,8 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha16"]
                  [integrant "0.4.0"]
-                 [medley "1.0.0"]]
+                 [medley "1.0.0"]
+                 [fipp "0.6.9"]]
   :plugins [[lein-codox "0.10.3"]]
   :codox {:output-path "codox"
           :project  {:name "Duct core"}
