@@ -1,3 +1,8 @@
+## 0.3.3 (2017-05-18)
+
+* Added fipp pprint protocol for Integrant refs
+* Fixed bad require in `duct.core.merge`
+
 ## 0.3.2 (2017-05-09)
 
 * Change `:duct.core/include` key to include configs recursively
