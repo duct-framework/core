@@ -2,6 +2,8 @@
   "Core functions required by a Duct application."
   (:refer-clojure :exclude [compile])
   (:require [com.stuartsierra.dependency :as dep]
+            [clojure.core :as core]
+            [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.set :as set]
             [clojure.string :as str]
@@ -10,6 +12,9 @@
             [fipp.ednize :as fipp]
             [integrant.core :as ig]
             [medley.core :as m]))
+
+(derive :duct.server/http :duct/server)
+(derive :duct/server      :duct/daemon)
 
 (extend-type integrant.core.Ref
   fipp/IOverride
@@ -146,20 +151,34 @@
   [config]
   (ig/init (prep config) [:duct/compiler]))
 
-(defn- derived-keys [config k]
-  (map key (ig/find-derived config k)))
+(defn- remove-compilers [keys]
+  (remove #(isa? % :duct/compiler) keys))
 
-(defn- dissoc-derived [config key]
-  (apply dissoc config (derived-keys config key)))
+(defn- has-daemon? [system]
+  (seq (ig/find-derived system :duct/daemon)))
+
+(defn parse-keys
+  "Parse config keys from a sequence of command line arguments."
+  [args]
+  (filter keyword? (map edn/read-string args)))
 
 (defn exec
-  "Prep then initiate a configuration, excluding keys that derive from
-  `:duct/compiler`, and then block indefinitely. This function should be called
-  from `-main` when a standalone application is required."
-  [config]
-  (let [system (-> config prep (dissoc-derived :duct/compiler) ig/init)]
-    (add-shutdown-hook ::exec #(ig/halt! system))
-    (.. Thread currentThread join)))
+  "Prep then initiate the supplied collection of keys in a configuration.
+
+  If the collection of keys is empty, all keys except for those deriving from
+  `:duct/compiler` are used. If any initiated key derives from `:duct/daemon`,
+  this function will block indefinitely and add a shutdown hook to halt the
+  system
+
+  This function should be called from `-main` when a standalone application
+  is required."
+  [config keys]
+  (let [prepped (prep config)
+        keys    (or (seq keys) (-> prepped core/keys remove-compilers))
+        system  (ig/init prepped keys)]
+    (when (has-daemon? system)
+      (add-shutdown-hook ::exec #(ig/halt! system))
+      (.. Thread currentThread join))))
 
 (defmethod ig/init-key ::environment [_ env] env)
 
