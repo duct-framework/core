@@ -154,11 +154,6 @@
        (apply-modules)
        (doto (load-namespaces load-keys)))))
 
-(defn compile
-  "Prep then initiate all keys that derive from `:duct/compiler`."
-  [config]
-  (ig/init (prep config) [:duct/compiler]))
-
 (defn- remove-compilers [keys]
   (remove #(isa? % :duct/compiler) keys))
 
