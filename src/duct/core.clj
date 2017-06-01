@@ -136,15 +136,23 @@
         (throw (missing-requirements-exception config modules applied)))
       config)))
 
+(defn- select-derived-keys [m ks]
+  (m/filter-keys #(some (partial isa? %) ks) m))
+
+(defn- load-namespaces [config keys]
+  (ig/load-namespaces (select-derived-keys config keys)))
+
 (defn prep
   "Prep a configuration, ready to be initiated. Key namespaces are loaded,
   resources included, and modules applied."
-  [config]
-  (-> config
-      (apply-includes (memoize read-config))
-      (doto ig/load-namespaces)
-      (apply-modules)
-      (doto ig/load-namespaces)))
+  ([config]
+   (prep config (keys config)))
+  ([config load-keys]
+   (-> config
+       (apply-includes (memoize read-config))
+       (doto (load-namespaces load-keys))
+       (apply-modules)
+       (doto (load-namespaces load-keys)))))
 
 (defn compile
   "Prep then initiate all keys that derive from `:duct/compiler`."
