@@ -146,30 +146,26 @@
       (apply-modules)
       (doto ig/load-namespaces)))
 
-(defn- remove-compilers [keys]
-  (remove #(isa? % :duct/compiler) keys))
-
-(defn- has-daemon? [system]
-  (seq (ig/find-derived system :duct/daemon)))
-
 (defn parse-keys
   "Parse config keys from a sequence of command line arguments."
   [args]
   (filter keyword? (map edn/read-string args)))
 
+(defn- has-daemon? [system]
+  (seq (ig/find-derived system :duct/daemon)))
+
 (defn exec
   "Prep then initiate the supplied collection of keys in a configuration.
 
-  If the collection of keys is empty, all keys except for those deriving from
-  `:duct/compiler` are used. If any initiated key derives from `:duct/daemon`,
-  this function will block indefinitely and add a shutdown hook to halt the
-  system
+  If the collection of keys is empty, all keys deriving from `:duct/daemon` are
+  used. If any initiated key derives from `:duct/daemon`, this function will
+  block indefinitely and add a shutdown hook to halt the system.
 
-  This function should be called from `-main` when a standalone application
+  This function is designed to be called from `-main` when standalone operation
   is required."
   [config keys]
   (let [prepped (prep config)
-        keys    (or (seq keys) (-> prepped core/keys remove-compilers))
+        keys    (or (seq keys) [:duct/daemon])
         system  (ig/init prepped keys)]
     (when (has-daemon? system)
       (add-shutdown-hook ::exec #(ig/halt! system))
