@@ -1,3 +1,10 @@
+## 0.4.0 (2017-06-02)
+
+* **BREAKING CHANGE** Removed `duct.core/compile`
+* **BREAKING CHANGE** `exec` initiates `:duct/daemon` keys by default
+* Added `:duct/server` and `:duct/daemon` keys
+* Added `keys` argument to `exec` function
+
 ## 0.3.3 (2017-05-18)
 
 * Added fipp pprint protocol for Integrant refs
