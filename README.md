@@ -40,22 +40,40 @@ This is ideally used with `integrant.repl`:
 (set-prep! #(duct/prep (get-config)))
 ```
 
-Alternatively, we can `compile` the configuration. This initiates all
-keys inheriting from `duct.compiler`, effectively acting like an asset
-pipeline. This is typically done before building an uberjar.
-
-```clojure
-(duct/compile (get-config))
-```
-
-Finally, we can `exec` the configuration. This prepares and initiates
-the configuration, then blocks the current thread. This is designed to
-be used from the `-main` function:
+Alternatives we can `exec` the configuration. This prepares and
+initiates the configuration, then blocks the current thread if the
+system includes any keys deriving from `:duct/daemon`. This is
+designed to be used from the `-main` function:
 
 ```clojure
 (defn -main []
   (duct/exec (get-config)))
 ```
+
+You can change the executed keys from `[:duct/daemon]` to anything you
+want by adding in an additional argument. This is frequently used with
+the `parse-keys` function, which parses keywords from command-line
+arguments:
+
+```clojure
+(defn -main [& args]
+  (duct/exec (get-config) (duct/parse-keys args))
+```
+
+This allows other parts of the system to be selectively executed. For
+example:
+
+```
+lein run :duct/compiler
+```
+
+Would initiate all the compiler keys. And:
+
+```
+lein run :duct/migrator
+```
+
+Would initiate the migrator and run all pending migrations.
 
 ## Keys
 
@@ -80,6 +98,11 @@ resource paths.
 `:router`, which should be a Ring handler, and `:middleware`, which
 should be an ordered vector of middleware. The middleware is applied
 to the router to create a completed Ring handler.
+
+In addition, it sets up some deriviations:
+
+* `:duct.server/http` derives from `:duct/server`
+* `:duct/server` derives from `:duct/daemon`
 
 ## Modules
 
