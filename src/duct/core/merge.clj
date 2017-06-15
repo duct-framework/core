@@ -70,6 +70,12 @@
       (merge (-> right meta* (dissoc :displace))
              (-> left meta* (dissoc :replace))))))
 
+(defn- demote? [obj]
+  (-> obj meta :demote))
+
+(defn- promote? [obj]
+  (-> obj meta :promote))
+
 (defn- prepend? [obj]
   (-> obj meta :prepend))
 
@@ -91,7 +97,9 @@
     (pick-prioritized left right)
 
     (and (map? left) (map? right))
-    (merge-with meta-merge left right)
+    (if (or (promote? left) (demote? right))
+      (merge-with meta-merge right left)
+      (merge-with meta-merge left right))
 
     (and (set? left) (set? right))
     (set/union right left)

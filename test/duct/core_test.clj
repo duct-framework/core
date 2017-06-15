@@ -25,20 +25,22 @@
 
 (deftest test-merge-configs
   (are [a b c] (= (core/merge-configs a b) c)
-    {::a 1}         {::a 2}                       {::a 2}
-    {::a {:x 1}}    {::a {:y 2}}                  {::a {:x 1 :y 2}}
-    {::a {:x 1}}    {::a ^:displace {:x 2}}       {::a {:x 1}}
-    {}              {::a ^:displace {:y 2}}       {::a {:y 2}}
-    {::aa 1}        {::a 2}                       {::aa 2}
-    {::aa 1 ::ab 2} {::a 3}                       {::aa 3 ::ab 3}
-    {::aa {:x 1}}   {::a {:y 2}}                  {::aa {:x 1 :y 2}}
-    {::a 1}         {::aa 2}                      {::aa 2}
-    {::a {:x 1}}    {::aa {:y 2}}                 {::aa {:x 1 :y 2}}
-    {::a {:x 1}}    {::aa {:y 2} ::ab {:z 3}}     {::aa {:x 1 :y 2} ::ab {:x 1 :z 3}}
-    {::a 1}         {::a (merge/displace 2)}      {::a 1}
-    {::a {:x 1}}    {::a {:x (merge/displace 2)}} {::a {:x 1}}
-    {::a [:x :y]}   {::a [:y :z]}                 {::a [:x :y :y :z]}
-    {::a [:x :y]}   {::a ^:distinct [:y :z]}      {::a [:x :y :z]}))
+    {::a 1}                {::a 2}                       {::a 2}
+    {::a {:x 1}}           {::a {:y 2}}                  {::a {:x 1 :y 2}}
+    {::a {:x 1}}           {::a ^:displace {:x 2}}       {::a {:x 1}}
+    {}                     {::a ^:displace {:y 2}}       {::a {:y 2}}
+    {::aa 1}               {::a 2}                       {::aa 2}
+    {::aa 1 ::ab 2}        {::a 3}                       {::aa 3 ::ab 3}
+    {::aa {:x 1}}          {::a {:y 2}}                  {::aa {:x 1 :y 2}}
+    {::a 1}                {::aa 2}                      {::aa 2}
+    {::a {:x 1}}           {::aa {:y 2}}                 {::aa {:x 1 :y 2}}
+    {::a {:x 1}}           {::aa {:y 2} ::ab {:z 3}}     {::aa {:x 1 :y 2} ::ab {:x 1 :z 3}}
+    {::a 1}                {::a (merge/displace 2)}      {::a 1}
+    {::a {:x 1}}           {::a {:x (merge/displace 2)}} {::a {:x 1}}
+    {::a [:x :y]}          {::a [:y :z]}                 {::a [:x :y :y :z]}
+    {::a [:x :y]}          {::a ^:distinct [:y :z]}      {::a [:x :y :z]}
+    {::a {:x 1}}           {::a ^:demote {:x 2, :y 3}}   {::a {:x 1, :y 3}}
+    {::a ^:promote {:x 1}} {::a {:x 2, :y 3}}            {::a {:x 1, :y 3}}))
 
 (derive ::xx ::x)
 
