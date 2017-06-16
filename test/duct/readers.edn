@@ -1,0 +1,2 @@
+{:foo #duct/resource "duct/config.edn"
+ :bar #custom/bar "bar"}

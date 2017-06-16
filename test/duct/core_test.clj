@@ -1,5 +1,6 @@
 (ns duct.core-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.java.io :as io]
+            [clojure.test :refer :all]
             [duct.core :as core]
             [duct.core.merge :as merge]
             [fipp.edn :as fipp]
@@ -41,6 +42,11 @@
     {::a [:x :y]}          {::a ^:distinct [:y :z]}      {::a [:x :y :z]}
     {::a {:x 1}}           {::a ^:demote {:x 2, :y 3}}   {::a {:x 1, :y 3}}
     {::a ^:promote {:x 1}} {::a {:x 2, :y 3}}            {::a {:x 1, :y 3}}))
+
+(deftest test-read-config
+  (is (= (core/read-config (io/resource "duct/readers.edn") {'custom/bar (fn [x] {:x x})})
+         {:foo (io/resource "duct/config.edn")
+          :bar {:x "bar"}})))
 
 (derive ::xx ::x)
 

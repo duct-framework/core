@@ -67,14 +67,14 @@
   [& configs]
   (merge/unwrap-all (reduce merge-configs* {} configs)))
 
-(def ^:private readers
+(def ^:private default-readers
   {'duct/resource io/resource
    'duct/env      env/env})
 
 (defn read-config
-  "Read an edn configuration from one or more slurpable sources. Multiple
-  sources are merged together with merge-configs. Three additional data readers
-  are supported:
+  "Read an edn configuration from a slurpable source. An optional map of data
+  readers may be supplied. By default the following three readers are
+  supported:
 
   #ig/ref
   : an Integrant reference to another key
@@ -85,9 +85,9 @@
   #duct/env
   : an environment variable, see [[duct.core.env/env]]"
   ([source]
-   (some->> source slurp (ig/read-string {:readers readers})))
-  ([source & sources]
-   (apply merge-configs (read-config source) (map read-config sources))))
+   (read-config source {}))
+  ([source readers]
+   (some->> source slurp (ig/read-string {:readers (merge default-readers readers)}))))
 
 (declare apply-includes)
 
