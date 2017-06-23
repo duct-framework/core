@@ -1,3 +1,9 @@
+## 0.5.0 (2017-06-23)
+
+* **BREAKING CHANGE** Removed varargs from `read-config`
+* Added custom data readers to `read-config`
+* Added `:demote` and `:promote` metadata to `merge-configs`
+
 ## 0.4.0 (2017-06-02)
 
 * **BREAKING CHANGE** Removed `duct.core/compile`
