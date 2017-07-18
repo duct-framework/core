@@ -1,3 +1,7 @@
+## 0.5.1 (2017-07-18)
+
+* Updated Integrant to 0.4.1 to fix resume bug
+
 ## 0.5.0 (2017-06-23)
 
 * **BREAKING CHANGE** Removed varargs from `read-config`
