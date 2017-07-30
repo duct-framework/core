@@ -1,3 +1,7 @@
+## 0.5.2 (2017-07-30)
+
+* Updated Integrant to 0.5.0
+
 ## 0.5.1 (2017-07-18)
 
 * Updated Integrant to 0.4.1 to fix resume bug
