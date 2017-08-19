@@ -12,9 +12,6 @@
             [integrant.core :as ig]
             [medley.core :as m]))
 
-(derive :duct.server/http :duct/server)
-(derive :duct/server      :duct/daemon)
-
 (def target-path
   "A path to place generated files in. Typically used by compilers. Can be set
   via the `duct.target.path` system property."
@@ -170,6 +167,32 @@
      (when (has-daemon? system)
        (add-shutdown-hook ::exec #(ig/halt! system))
        (.. Thread currentThread join)))))
+
+(defn- hierarchy-urls []
+  (let [cl (.. Thread currentThread getContextClassLoader)]
+    (enumeration-seq (.getResources cl "duct_hierarchy.edn"))))
+
+(defn load-hierarchy
+  "Search the base classpath for files named `duct_hierarchy.edn`, and use them
+  to extend the global `derive` hierarchy. This allows a hierarchy to be
+  constructed without needing to load every namespace.
+
+  The `duct_hierarchy.edn` file should be an edn map that maps child keywords
+  to vectors of parents. For example:
+
+      {:example/child [:example/father :example/mother]}
+
+  This is equivalent to writing:
+
+      (derive :example/child :example/father)
+      (derive :example/child :example/mother)
+
+  This function should be called once when the application is started."
+  []
+  (doseq [url (hierarchy-urls)]
+    (let [hierarchy (edn/read-string (slurp url))]
+      (doseq [[tag parents] hierarchy, parent parents]
+        (derive tag parent)))))
 
 (defmethod ig/init-key ::environment [_ env] env)
 

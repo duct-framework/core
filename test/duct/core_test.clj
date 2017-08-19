@@ -100,6 +100,11 @@
       (is (= (core/prep config)
              (merge config {::xx 1, ::y 2, ::z 3}))))))
 
+(deftest test-load-hierarchy
+  (core/load-hierarchy)
+  (is (isa? :duct/server :duct/daemon))
+  (is (isa? :duct.server/http :duct/server)))
+
 (deftest test-environment-keyword
   (let [m {::core/environment :development}]
     (is (= m (ig/init m)))))

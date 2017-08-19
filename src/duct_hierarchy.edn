@@ -1,0 +1,2 @@
+{:duct/server      [:duct/daemon]
+ :duct.server/http [:duct/server]}
