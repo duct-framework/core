@@ -155,7 +155,7 @@
   (seq (ig/find-derived system :duct/daemon)))
 
 (defn exec
-  "Prep then initiate the configuration with an optional collection of keys.
+  "Initiate a prepped configuration with an optional collection of keys.
 
   If the collection of keys is empty, all keys deriving from `:duct/daemon` are
   used. If any initiated key derives from `:duct/daemon`, this function will
@@ -166,9 +166,8 @@
   ([config]
    (exec config nil))
   ([config keys]
-   (let [prepped (prep config)
-         keys    (or (seq keys) [:duct/daemon])
-         system  (ig/init prepped keys)]
+   (let [keys   (or (seq keys) [:duct/daemon])
+         system (ig/init config keys)]
      (when (has-daemon? system)
        (add-shutdown-hook ::exec #(ig/halt! system))
        (.. Thread currentThread join)))))
