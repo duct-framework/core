@@ -132,13 +132,18 @@
 
 (defn prep
   "Prep a configuration, ready to be initiated. Key namespaces are loaded,
-  resources included, and modules applied."
-  [config]
-  (-> config
-      (apply-includes (memoize read-config))
-      (doto ig/load-namespaces)
-      (apply-modules)
-      (doto ig/load-namespaces)))
+  resources included, and modules applied.
+
+  An optional map of data readers may be supplied to be used when reading
+  configurations imported via `:duct.core/include`."
+  ([config]
+   (prep config {}))
+  ([config readers]
+   (-> config
+       (apply-includes (memoize #(read-config % readers)))
+       (doto ig/load-namespaces)
+       (apply-modules)
+       (doto ig/load-namespaces))))
 
 (defn parse-keys
   "Parse config keys from a sequence of command line arguments."

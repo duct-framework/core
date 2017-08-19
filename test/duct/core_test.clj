@@ -71,6 +71,12 @@
               ::b {:x 2, :y 2}
               ::c {:x 3}}))))
 
+  (testing "include with custom reader"
+    (let [config {::core/include ["duct/reader"]}]
+      (is (= (core/prep config {'duct/inc inc})
+             {::core/include ["duct/reader"]
+              ::a {:x 2}}))))
+
   (testing "valid modules"
     (let [config {::mod1 {}, ::mod2 {}, ::mod3 {}}]
       (is (= (core/prep config)
