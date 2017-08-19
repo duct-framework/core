@@ -9,17 +9,11 @@
             [clojure.string :as str]
             [duct.core.env :as env]
             [duct.core.merge :as merge]
-            [fipp.ednize :as fipp]
             [integrant.core :as ig]
             [medley.core :as m]))
 
 (derive :duct.server/http :duct/server)
 (derive :duct/server      :duct/daemon)
-
-(extend-type integrant.core.Ref
-  fipp/IOverride
-  fipp/IEdn
-  (-edn [r] (tagged-literal 'ig/ref (:key r))))
 
 (def target-path
   "A path to place generated files in. Typically used by compilers. Can be set

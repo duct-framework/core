@@ -3,12 +3,7 @@
             [clojure.test :refer :all]
             [duct.core :as core]
             [duct.core.merge :as merge]
-            [fipp.edn :as fipp]
             [integrant.core :as ig]))
-
-(deftest test-pprint
-  (is (= (with-out-str (fipp/pprint (ig/ref :duct.router/cascading)))
-         "#ig/ref :duct.router/cascading\n")))
 
 (deftest test-add-shutdown-hook
   (let [f #(identity true)
