@@ -40,24 +40,26 @@ This is ideally used with `integrant.repl`:
 (set-prep! #(duct/prep (get-config)))
 ```
 
-Alternatives we can `exec` the configuration. This prepares and
+Alternatives we can `prep` then `exec` the configuration. This
 initiates the configuration, then blocks the current thread if the
 system includes any keys deriving from `:duct/daemon`. This is
 designed to be used from the `-main` function:
 
 ```clojure
 (defn -main []
-  (duct/exec (get-config)))
+  (-> (get-config) (duct/prep) (duct/exec)))
 ```
 
-You can change the executed keys from `[:duct/daemon]` to anything you
-want by adding in an additional argument. This is frequently used with
-the `parse-keys` function, which parses keywords from command-line
-arguments:
+You can change the executed keys to anything you want by adding in an
+additional argument. This is frequently used with the `parse-keys`
+function, which parses keywords from command-line arguments:
 
 ```clojure
 (defn -main [& args]
-  (duct/exec (get-config) (duct/parse-keys args))
+  (let [keys (or (duct/parse-keys args) [:duct/daemon])]
+    (-> (get-config)
+        (duct/prep keys)
+        (duct/exec keys))))
 ```
 
 This allows other parts of the system to be selectively executed. For
@@ -73,7 +75,9 @@ Would initiate all the compiler keys. And:
 lein run :duct/migrator
 ```
 
-Would initiate the migrator and run all pending migrations.
+Would initiate the migrator and run all pending migrations. If no
+arguments are supplied, the keys default to `[:duct/daemon]` in this
+example.
 
 ## Keys
 
