@@ -160,17 +160,16 @@
 (defn exec
   "Initiate a prepped configuration with an optional collection of keys.
 
-  If the collection of keys is empty, all keys deriving from `:duct/daemon` are
-  used. If any initiated key derives from `:duct/daemon`, this function will
-  block indefinitely and add a shutdown hook to halt the system.
+  If the collection of keys is empty, all keys are used. If any initiated key
+  derives from `:duct/daemon`, this function will block indefinitely and add a
+  shutdown hook to halt the system.
 
   This function is designed to be called from `-main` when standalone operation
   is required."
   ([config]
-   (exec config nil))
+   (exec config (keys config)))
   ([config keys]
-   (let [keys   (or (seq keys) [:duct/daemon])
-         system (ig/init config keys)]
+   (let [system (ig/init config keys)]
      (when (has-daemon? system)
        (add-shutdown-hook ::exec #(ig/halt! system))
        (.. Thread currentThread join)))))
