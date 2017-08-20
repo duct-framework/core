@@ -73,7 +73,7 @@
 
   (testing "include with custom reader"
     (let [config {::core/include ["duct/reader"]}]
-      (is (= (core/prep config {'duct/inc inc})
+      (is (= (core/prep config (keys config) {:readers {'duct/inc inc}})
              {::core/include ["duct/reader"]
               ::a {:x 2}}))))
 

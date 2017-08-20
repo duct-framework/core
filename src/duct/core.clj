@@ -131,16 +131,23 @@
   "Prep a configuration, ready to be initiated. Key namespaces are loaded,
   resources included, and modules applied.
 
-  An optional map of data readers may be supplied to be used when reading
-  configurations imported via `:duct.core/include`."
+  Like `init` and other Integrant functions, `prep` can be limited to a subset
+  of keys. The keys supplied indicate which keys will be later initiated, and
+  therefore which keys to load. Modules are always loaded and applied.
+
+  A map of options may also be supplied. Currently the only supported option is
+  `:readers`, which should contain a map of data readers that will be used when
+  reading configurations imported through `:duct.core/include`. "
   ([config]
-   (prep config {}))
-  ([config readers]
+   (prep config (keys config)))
+  ([config keys]
+   (prep config keys {}))
+  ([config keys {:keys [readers] :or {readers {}}}]
    (-> config
        (apply-includes (memoize #(read-config % readers)))
-       (doto ig/load-namespaces)
+       (doto (ig/load-namespaces [:duct/module]))
        (apply-modules)
-       (doto ig/load-namespaces))))
+       (doto (ig/load-namespaces keys)))))
 
 (defn parse-keys
   "Parse config keys from a sequence of command line arguments."
