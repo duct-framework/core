@@ -6,7 +6,7 @@
   :dependencies [[org.clojure/clojure "1.9.0-alpha17"]
                  [integrant "0.6.1"]
                  [medley "1.0.0"]
-                 [fipp "0.6.9"]]
+                 [fipp "0.6.10"]]
   :plugins [[lein-codox "0.10.3"]]
   :codox {:output-path "codox"
           :project  {:name "Duct core"}
