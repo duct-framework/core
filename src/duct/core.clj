@@ -152,7 +152,7 @@
 (defn parse-keys
   "Parse config keys from a sequence of command line arguments."
   [args]
-  (filter keyword? (map edn/read-string args)))
+  (seq (filter keyword? (map edn/read-string args))))
 
 (defn- has-daemon? [system]
   (seq (ig/find-derived system :duct/daemon)))
