@@ -1,3 +1,12 @@
+## 0.6.0 (2017-08-21)
+
+* **BREAKING CHANGE** Removed implicit `prep` from `exec`
+* Added `load-hierarchy`
+* Added keys argument to `prep`
+* Added data `:readers` option to `prep`
+* Moved Fipp setup to `duct.core.repl`
+* Updated Integrant to 0.6.1
+
 ## 0.5.2 (2017-07-30)
 
 * Updated Integrant to 0.5.0
