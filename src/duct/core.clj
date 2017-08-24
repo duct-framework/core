@@ -139,7 +139,7 @@
   `:readers`, which should contain a map of data readers that will be used when
   reading configurations imported through `:duct.core/include`. "
   ([config]
-   (prep config (keys config)))
+   (prep config nil))
   ([config keys]
    (prep config keys {}))
   ([config keys {:keys [readers] :or {readers {}}}]
@@ -147,7 +147,9 @@
        (apply-includes (memoize #(read-config % readers)))
        (doto (ig/load-namespaces [:duct/module]))
        (apply-modules)
-       (doto (ig/load-namespaces keys)))))
+       (doto (as-> cfg (if keys
+                         (ig/load-namespaces cfg keys)
+                         (ig/load-namespaces cfg)))))))
 
 (defn parse-keys
   "Parse config keys from a sequence of command line arguments."

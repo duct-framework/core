@@ -48,6 +48,7 @@
 (derive ::mod1 :duct/module)
 (derive ::mod2 :duct/module)
 (derive ::mod3 :duct/module)
+(derive ::mod4 :duct/module)
 
 (defmethod ig/init-key ::x [_ x] x)
 
@@ -59,6 +60,9 @@
 
 (defmethod ig/init-key ::mod3 [_ _]
   {:req #{::x ::y}, :fn (fn [cfg] (assoc cfg ::z (+ (::xx cfg) (::y cfg))))})
+
+(defmethod ig/init-key ::mod4 [_ {:keys [foo]}]
+  {:req #{}, :fn (fn [cfg] (assoc cfg :duct.example/foo foo))})
 
 (deftest test-prep
   (testing "includes"
@@ -98,7 +102,12 @@
                   ::mod3 {}
                   ::xx 1}]
       (is (= (core/prep config)
-             (merge config {::xx 1, ::y 2, ::z 3}))))))
+             (merge config {::xx 1, ::y 2, ::z 3})))))
+
+  (testing "loading keys introduced by modules"
+    (let [config {::mod4 {:foo 1}}]
+      (is (= (-> config core/prep ig/init :duct.example/foo)
+             [:foo 1])))))
 
 (deftest test-load-hierarchy
   (core/load-hierarchy)
