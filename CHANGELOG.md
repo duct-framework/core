@@ -1,3 +1,7 @@
+## 0.6.1 (2017-08-24)
+
+* Fixed `prep` not loading namespaces for keys added by modules
+
 ## 0.6.0 (2017-08-21)
 
 * **BREAKING CHANGE** Removed implicit `prep` from `exec`
