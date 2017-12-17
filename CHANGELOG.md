@@ -1,3 +1,7 @@
+## 0.6.2 (2017-12-17)
+
+* Updated dependencies
+
 ## 0.6.1 (2017-08-24)
 
 * Fixed `prep` not loading namespaces for keys added by modules
