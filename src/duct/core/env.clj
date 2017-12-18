@@ -1,5 +1,6 @@
 (ns duct.core.env
-  "Functions for pulling values from environment variables.")
+  "Functions for pulling values from environment variables."
+  (:require [clojure.string :as str]))
 
 (defmulti coerce
   "Coerce a value to the type referenced by a symbol. By default supports
@@ -11,6 +12,15 @@
 
 (defmethod coerce 'Str [x _]
   (str x))
+
+(defmethod coerce 'Bool [x _]
+  (case (some-> x str/lower-case)
+    ("true" "t" "yes" "y") true
+    ("false" "f" "no" "n" "" nil) false
+    (throw (ex-info (str "Could not coerce '" (pr-str x) "' into a boolean."
+                         "Must be one of: \"true\", \"t\", \"false\", \"f\","
+                         "\"yes\", \"y\", \"no\", \"n\", \"\" or nil.")
+                    {:value x, :coercion 'Bool}))))
 
 (defn env
   "Resolve an environment variable by name. Optionally accepts a type for
