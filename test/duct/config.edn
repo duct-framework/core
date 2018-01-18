@@ -1,2 +1,2 @@
-{:duct.core/include ["duct/included"]
- :duct.core-test/a {:x 1}}
+[{:duct.core/include #duct/include ["duct/included"]
+   :duct.core-test/a {:x 1}}]
