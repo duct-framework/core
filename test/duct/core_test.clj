@@ -64,16 +64,19 @@
 (defmethod ig/init-key ::mod4 [_ {:keys [foo]}]
   {:req #{}, :fn (fn [cfg] (assoc cfg :duct.example/foo foo))})
 
-(deftest test-prep
+(deftest including
   (testing "includes"
-    (let [config {::core/include ["duct/config"]
-                  ::b {:x 2}
-                  ::c {:x 3}}]
+    (let [config [{::core/include (core/include ["duct/config"])
+                   ::b {:x 2}
+                   ::c {:x 3}}]]
       (is (= (core/prep config)
              {::core/include ["duct/included" "duct/config"]
               ::a {:x 1}
               ::b {:x 2, :y 2}
-              ::c {:x 3}}))))
+              ::c {:x 3}})))))
+
+(deftest test-prep
+  
 
   (testing "include with custom reader"
     (let [config {::core/include ["duct/reader"]}]

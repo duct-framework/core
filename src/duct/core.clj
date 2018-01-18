@@ -58,9 +58,18 @@
   [& configs]
   (merge/unwrap-all (reduce merge-configs* {} configs)))
 
+(declare prep read-config)
+
+;; TODO pass in readers
+(defn include
+  [includes]
+  (map (comp prep #(read-config % default-readers) config-resource)
+       includes))
+
 (def ^:private default-readers
   {'duct/resource io/resource
-   'duct/env      env/env})
+   'duct/env      env/env
+   'duct/include  include})
 
 (defn read-config
   "Read an edn configuration from a slurpable source. An optional map of data
@@ -88,7 +97,7 @@
       (io/resource (str path ".clj"))))
 
 (defn- load-config-resource [path reader]
-  (-> (config-resource path) (reader) (apply-includes reader)))
+  (reader (config-resource path)))
 
 (defn- load-includes [config reader]
   (mapv #(load-config-resource % reader) (::include config)))
@@ -127,6 +136,15 @@
         (throw (missing-requirements-exception config modules applied)))
       config)))
 
+(defn prep-section
+  [config keys {:keys [readers] :or {readers {}}}]
+  (-> config
+      (doto (ig/load-namespaces [:duct/module]))
+      (apply-modules)
+      (doto (as-> cfg (if keys
+                        (ig/load-namespaces cfg keys)
+                        (ig/load-namespaces cfg))))))
+
 (defn prep
   "Prep a configuration, ready to be initiated. Key namespaces are loaded,
   resources included, and modules applied.
@@ -142,14 +160,8 @@
    (prep config nil))
   ([config keys]
    (prep config keys {}))
-  ([config keys {:keys [readers] :or {readers {}}}]
-   (-> config
-       (apply-includes (memoize #(read-config % readers)))
-       (doto (ig/load-namespaces [:duct/module]))
-       (apply-modules)
-       (doto (as-> cfg (if keys
-                         (ig/load-namespaces cfg keys)
-                         (ig/load-namespaces cfg)))))))
+  ([config keys opts]
+   (apply merge-configs (map #(prep-section % keys opts) config))))
 
 (defn parse-keys
   "Parse config keys from a sequence of command line arguments."
@@ -206,7 +218,10 @@
 
 (defmethod ig/init-key ::project-ns [_ ns] ns)
 
-(defmethod ig/init-key ::include [_ paths] paths)
+
+(derive ::include :duct/module)
+(defmethod ig/init-key ::include [_ configs]
+  {:fn (fn [config] (apply merge-configs config configs))})
 
 (defmethod ig/init-key ::handler [_ {:keys [middleware router]}]
   ((apply comp (reverse middleware)) router))
