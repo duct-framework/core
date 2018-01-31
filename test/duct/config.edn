@@ -1,2 +1,2 @@
-{:duct.core/include ["duct/included"]
- :duct.core-test/a {:x 1}}
+{:bar/a {:x 1}
+ :bar/b #ig/ref :bar/a}

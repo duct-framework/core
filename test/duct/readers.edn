@@ -1,2 +1,5 @@
-{:foo #duct/resource "duct/config.edn"
- :bar #custom/bar "bar"}
+{:foo/a #custom/bar "bar"
+ :foo/b #duct/include "duct/config.edn"
+ :foo/c #duct/resource "duct/config.edn"
+ :foo/d #ig/ref :foo/a
+ :foo/e #ig/refset :foo/b}

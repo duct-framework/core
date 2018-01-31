@@ -15,6 +15,11 @@
   (let [hooks (core/remove-shutdown-hook ::foo)]
     (is (nil? (::foo hooks)))))
 
+(deftest test-load-hierarchy
+  (core/load-hierarchy)
+  (is (isa? :duct/server :duct/daemon))
+  (is (isa? :duct.server/http :duct/server)))
+
 (derive ::aa ::a)
 (derive ::ab ::a)
 (derive ::ab ::b)
@@ -40,79 +45,38 @@
 
 (deftest test-read-config
   (is (= (core/read-config (io/resource "duct/readers.edn") {'custom/bar (fn [x] {:x x})})
-         {:foo (io/resource "duct/config.edn")
-          :bar {:x "bar"}})))
+         {:foo/a {:x "bar"}
+          :foo/b {:bar/a {:x 1}, :bar/b (ig/ref :bar/a)}
+          :foo/c (io/resource "duct/config.edn")
+          :foo/d (ig/ref :foo/a)
+          :foo/e (ig/refset :foo/b)})))
 
-(derive ::xx ::x)
+(defmethod ig/init-key ::foo [_ {:keys [x]}]
+  #(update % ::x (fnil conj []) x))
 
-(derive ::mod1 :duct/module)
-(derive ::mod2 :duct/module)
-(derive ::mod3 :duct/module)
-(derive ::mod4 :duct/module)
+(defmethod ig/init-key ::bar [_ {:keys [x]}]
+  #(update % ::x (fnil conj []) x))
 
-(defmethod ig/init-key ::x [_ x] x)
+(deftest test-build-config
+  (let [m {::foo {:x 1}, ::bar {:x 2, :r (ig/ref ::foo)}}]
+    (is (= (core/build-config (ig/init m))
+           {::x [1 2]}))))
 
-(defmethod ig/init-key ::mod1 [_ _]
-  {:fn (fn [cfg] (assoc cfg ::xx 1))})
+(deftest test-parse-keys
+  (is (= (seq (core/parse-keys [])) nil))
+  (is (= (seq (core/parse-keys [":foo/a" ":bar/b"])) [:foo/a :bar/b])))
 
-(defmethod ig/init-key ::mod2 [_ _]
-  {:req #{::xx}, :fn (fn [cfg] (assoc cfg ::y (inc (::xx cfg))))})
-
-(defmethod ig/init-key ::mod3 [_ _]
-  {:req #{::x ::y}, :fn (fn [cfg] (assoc cfg ::z (+ (::xx cfg) (::y cfg))))})
-
-(defmethod ig/init-key ::mod4 [_ {:keys [foo]}]
-  {:req #{}, :fn (fn [cfg] (assoc cfg :duct.example/foo foo))})
-
-(deftest test-prep
-  (testing "includes"
-    (let [config {::core/include ["duct/config"]
-                  ::b {:x 2}
-                  ::c {:x 3}}]
-      (is (= (core/prep config)
-             {::core/include ["duct/included" "duct/config"]
-              ::a {:x 1}
-              ::b {:x 2, :y 2}
-              ::c {:x 3}}))))
-
-  (testing "include with custom reader"
-    (let [config {::core/include ["duct/reader"]}]
-      (is (= (core/prep config (keys config) {:readers {'duct/inc inc}})
-             {::core/include ["duct/reader"]
-              ::a {:x 2}}))))
-
-  (testing "valid modules"
-    (let [config {::mod1 {}, ::mod2 {}, ::mod3 {}}]
-      (is (= (core/prep config)
-             (merge config {::xx 1, ::y 2, ::z 3})))))
-
-  (testing "missing requirements"
-    (let [config {::mod2 {}, ::mod3 {}}]
-      (is (thrown-with-msg?
-           clojure.lang.ExceptionInfo
-           (re-pattern
-            (str "Missing module requirements: "
-                 ::mod2 " requires \\(" ::xx "\\), "
-                 ::mod3 " requires \\(" ::x " " ::y "\\)"))
-           (core/prep config)))))
-
-  (testing "valid modules with dependencies"
-    (let [config {::mod1 {:x (ig/ref ::x)},
-                  ::mod2 {}
-                  ::mod3 {}
-                  ::xx 1}]
-      (is (= (core/prep config)
-             (merge config {::xx 1, ::y 2, ::z 3})))))
-
-  (testing "loading keys introduced by modules"
-    (let [config {::mod4 {:foo 1}}]
-      (is (= (-> config core/prep ig/init :duct.example/foo)
-             [:foo 1])))))
-
-(deftest test-load-hierarchy
+(deftest test-profile-keyword
   (core/load-hierarchy)
-  (is (isa? :duct/server :duct/daemon))
-  (is (isa? :duct.server/http :duct/server)))
+  (let [m {:duct.profile/base  {::a 1, ::b (ig/ref ::a)}
+           [:duct/profile ::x] {::a 2, ::c (ig/refset ::b)}}
+        p (ig/prep m)]
+    (is (= p
+           {:duct.profile/base  {::a 1, ::b (core/->InertRef ::a)}
+            [:duct/profile ::x] {::a 2, ::c (core/->InertRefSet ::b)
+                                 ::core/requires (ig/ref :duct.profile/base)}}))
+    (is (= (core/build-config (ig/init p))
+           {::a 2, ::b (ig/ref ::a), ::c (ig/refset ::b)}))))
 
 (deftest test-environment-keyword
   (let [m {::core/environment :development}]
