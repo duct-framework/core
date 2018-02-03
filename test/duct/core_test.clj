@@ -90,6 +90,18 @@
     (is (= (core/fold-modules (ig/init p))
            {::a 2, ::b (ig/ref ::a), ::c (ig/refset ::b)}))))
 
+(deftest test-build-config
+  (core/load-hierarchy)
+  (let [m {:duct.profile/base  {::a 1, ::b (ig/ref ::a)}
+           [:duct/profile ::x] {::a 2, ::c (ig/refset ::b)}
+           [:duct/profile ::y] {::d 3}}]
+    (is (= (core/build-config m)
+           {::a 2, ::b (ig/ref ::a), ::c (ig/refset ::b), ::d 3}))
+    (is (= (core/build-config m [::x])
+           {::a 2, ::b (ig/ref ::a), ::c (ig/refset ::b)}))
+    (is (= (core/build-config m [:y])
+           {::a 1, ::b (ig/ref ::a), ::d 3}))))
+
 (deftest test-environment-keyword
   (let [m {::core/environment :development}]
     (is (= m (ig/init m)))))

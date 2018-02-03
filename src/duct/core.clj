@@ -154,6 +154,16 @@
   [config profiles]
   (filter (partial keep-key? profiles) (keys config)))
 
+(defn build-config
+  "Build an Integrant configuration from a configuration of modules. A
+  collection of profile keys may optionally be supplied that govern which
+  profiles to use (see [[profile-keys]])."
+  ([config]
+   (-> config ig/prep ig/init fold-modules))
+  ([config profiles]
+   (let [keys (profile-keys config profiles)]
+     (-> config ig/prep (ig/init keys) fold-modules))))
+
 (defn parse-keys
   "Parse config keys from a sequence of command line arguments."
   [args]
