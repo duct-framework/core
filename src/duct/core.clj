@@ -130,6 +130,30 @@
   [modules]
   (ig/fold modules (fn [m _ f] (f m)) {}))
 
+(defn- matches-name? [key profile-key]
+  (letfn [(matches? [k] (= (name k) (name profile-key)))]
+    (if (vector? key)
+      (some matches? key)
+      (matches? key))))
+
+(defn- matches-profile? [key profile-key]
+  (if (namespace profile-key)
+    (ig/derived-from? key profile-key)
+    (matches-name? key profile-key)))
+
+(defn- keep-key? [profiles key]
+  (or (not (ig/derived-from? key :duct/profile))
+      (ig/derived-from? key :duct.profile/base)
+      (some (partial matches-profile? key) profiles)))
+
+(defn profile-keys
+  "Return a collection of keys for a configuration that excludes any profile
+  not present in the supplied colleciton of profiles. Profiles may be specified
+  as namespaced keywords, or as un-namespaced keywords, in which case only the
+  name will matched (e.g. `:dev` will match `:duct.profile/dev`)."
+  [config profiles]
+  (filter (partial keep-key? profiles) (keys config)))
+
 (defn parse-keys
   "Parse config keys from a sequence of command line arguments."
   [args]

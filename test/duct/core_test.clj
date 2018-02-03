@@ -62,6 +62,18 @@
     (is (= (core/build-config (ig/init m))
            {::x [1 2]}))))
 
+(deftest test-profile-keys
+  (let [m {:duct.module/foo    {::a 0}
+           :duct.profile/base  {::a 1}
+           [:duct/profile ::x] {::a 2}
+           [:duct/profile ::y] {::a 3}
+           [:duct/profile ::z] {::a 4}}]
+    (is (= (set (core/profile-keys m [::x :y]))
+           #{:duct.module/foo
+             :duct.profile/base
+             [:duct/profile ::x]
+             [:duct/profile ::y]}))))
+
 (deftest test-parse-keys
   (is (= (seq (core/parse-keys [])) nil))
   (is (= (seq (core/parse-keys [":foo/a" ":bar/b"])) [:foo/a :bar/b])))
