@@ -122,13 +122,13 @@
   ([source readers]
    (some->> source slurp (ig/read-string {:readers (merge-default-readers readers)}))))
 
-(defn build-config
-  "Build an Integrant configuration from a system map of modules. A module is a
+(defn fold-modules
+  "Fold a system map of modules into an Integrant configuration. A module is a
   pure function that transforms a configuration map. The modules are traversed
   in dependency order and applied to iteratively to a blank map in order to
   build the final configuration."
-  [modules]
-  (ig/fold modules (fn [m _ f] (f m)) {}))
+  [system]
+  (ig/fold system (fn [m _ f] (f m)) {}))
 
 (defn- matches-name? [key profile-key]
   (letfn [(matches? [k] (= (name k) (name profile-key)))]

@@ -57,9 +57,9 @@
 (defmethod ig/init-key ::bar [_ {:keys [x]}]
   #(update % ::x (fnil conj []) x))
 
-(deftest test-build-config
+(deftest test-fold-modules
   (let [m {::foo {:x 1}, ::bar {:x 2, :r (ig/ref ::foo)}}]
-    (is (= (core/build-config (ig/init m))
+    (is (= (core/fold-modules (ig/init m))
            {::x [1 2]}))))
 
 (deftest test-profile-keys
@@ -87,7 +87,7 @@
            {:duct.profile/base  {::a 1, ::b (core/->InertRef ::a)}
             [:duct/profile ::x] {::a 2, ::c (core/->InertRefSet ::b)
                                  ::core/requires (ig/ref :duct.profile/base)}}))
-    (is (= (core/build-config (ig/init p))
+    (is (= (core/fold-modules (ig/init p))
            {::a 2, ::b (ig/ref ::a), ::c (ig/refset ::b)}))))
 
 (deftest test-environment-keyword
