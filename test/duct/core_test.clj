@@ -118,3 +118,31 @@
         f (::core/handler (ig/init m))]
     (is (= (f {:request-method :get, :uri "/"})
            {:status 200, :headers {"X-Foo" "baz"}, :body "foo"}))))
+
+(deftest test-profile-dev-keyword
+  (core/load-hierarchy)
+  (let [m {:duct.profile/base {::a 1, ::b (ig/ref ::a)}
+           :duct.profile/dev  {::a 2, ::c (ig/refset ::b)}}
+        p (ig/prep m)]
+    (is (= p
+           {:duct.profile/base {::a 1, ::b (core/->InertRef ::a)}
+            :duct.profile/dev  {::a 2, ::c (core/->InertRefSet ::b)
+                                ::core/requires (ig/ref :duct.profile/base)
+                                ::core/environment :development}}))
+    (is (= (core/fold-modules (ig/init p))
+           {::a 2, ::b (ig/ref ::a), ::c (ig/refset ::b)
+            ::core/environment :development}))))
+
+(deftest test-profile-prod-keyword
+  (core/load-hierarchy)
+  (let [m {:duct.profile/base {::a 1, ::b (ig/ref ::a)}
+           :duct.profile/prod {::a 2, ::c (ig/refset ::b)}}
+        p (ig/prep m)]
+    (is (= p
+           {:duct.profile/base {::a 1, ::b (core/->InertRef ::a)}
+            :duct.profile/prod {::a 2, ::c (core/->InertRefSet ::b)
+                                ::core/requires (ig/ref :duct.profile/base)
+                                ::core/environment :production}}))
+    (is (= (core/fold-modules (ig/init p))
+           {::a 2, ::b (ig/ref ::a), ::c (ig/refset ::b)
+            ::core/environment :production}))))

@@ -198,8 +198,12 @@
     (instance? InertRefSet x) (ig/refset (:key x))
     :else x))
 
-(defmethod ig/prep-key :duct.profile/base [_ profile]
-  (walk/postwalk deactivate-ref profile))
+(defmethod ig/init-key ::environment [_ env] env)
+
+(defmethod ig/init-key ::project-ns [_ ns] ns)
+
+(defmethod ig/init-key ::handler [_ {:keys [middleware router]}]
+  ((apply comp (reverse middleware)) router))
 
 (defmethod ig/prep-key :duct/profile [_ profile]
   (-> (walk/postwalk deactivate-ref profile)
@@ -209,9 +213,13 @@
   (let [profile (walk/postwalk activate-ref (dissoc profile ::requires))]
     #(merge-configs % profile)))
 
-(defmethod ig/init-key ::environment [_ env] env)
+(defmethod ig/prep-key :duct.profile/base [_ profile]
+  (walk/postwalk deactivate-ref profile))
 
-(defmethod ig/init-key ::project-ns [_ ns] ns)
+(defmethod ig/prep-key :duct.profile/dev [_ profile]
+  (-> (ig/prep-key :duct/profile profile)
+      (assoc ::environment :development)))
 
-(defmethod ig/init-key ::handler [_ {:keys [middleware router]}]
-  ((apply comp (reverse middleware)) router))
+(defmethod ig/prep-key :duct.profile/prod [_ profile]
+  (-> (ig/prep-key :duct/profile profile)
+      (assoc ::environment :production)))
