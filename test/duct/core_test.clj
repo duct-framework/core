@@ -20,6 +20,34 @@
   (is (isa? :duct/server :duct/daemon))
   (is (isa? :duct.server/http :duct/server)))
 
+(deftest test-load-hierarchy-output
+  (testing "reading from the file system"
+    (let [h (core/load-hierarchy)]
+      (is (contains? (-> h :duct/server set) :duct/daemon))
+      (is (contains? (-> h :duct.server/http set) :duct/server))))
+  (testing "supplying map arguments"
+    (testing "with a single hierarchy"
+      (let [server (gensym :duct/server)
+            daemon (gensym :duct/daemon)
+            h (core/load-hierarchy {server [daemon]})]
+        (is (contains? (-> h server set) daemon))))
+    (testing "with multiple independent hierarchies"
+      (let [server (gensym :duct/server)
+            daemon (gensym :duct/daemon)
+            http (gensym :duct.server/http)
+            h (core/load-hierarchy {server [daemon]} {http [server]})]
+        (is (contains? (-> h server set) daemon))
+        (is (contains? (-> h http set) server))))
+    (testing "with overlapping hierarchies"
+      (let [x (gensym ::x)
+            y (gensym ::y)
+            a (gensym ::a)
+            b (gensym ::b)
+            c (gensym ::c)
+            h (core/load-hierarchy {x [a]} {x [b]} {x [c]} {y [a]})]
+        (is (= (set (x h)) #{a b c}))
+        (is (= (set (y h)) #{a}))))))
+
 (derive ::aa ::a)
 (derive ::ab ::a)
 (derive ::ab ::b)

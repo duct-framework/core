@@ -38,32 +38,6 @@
   [key]
   (swap! hooks dissoc key))
 
-(defn- hierarchy-urls []
-  (let [cl (.. Thread currentThread getContextClassLoader)]
-    (enumeration-seq (.getResources cl "duct_hierarchy.edn"))))
-
-(defn load-hierarchy
-  "Search the base classpath for files named `duct_hierarchy.edn`, and use them
-  to extend the global `derive` hierarchy. This allows a hierarchy to be
-  constructed without needing to load every namespace.
-
-  The `duct_hierarchy.edn` file should be an edn map that maps child keywords
-  to vectors of parents. For example:
-
-      {:example/child [:example/father :example/mother]}
-
-  This is equivalent to writing:
-
-      (derive :example/child :example/father)
-      (derive :example/child :example/mother)
-
-  This function should be called once when the application is started."
-  []
-  (doseq [url (hierarchy-urls)]
-    (let [hierarchy (edn/read-string (slurp url))]
-      (doseq [[tag parents] hierarchy, parent parents]
-        (derive tag parent)))))
-
 (defn- expand-ancestor-keys [config base]
   (reduce-kv
    (fn [m k v]
@@ -83,6 +57,45 @@
   into more specific descendants, if the descendants exist."
   [& configs]
   (merge/unwrap-all (reduce merge-configs* {} configs)))
+
+(defn- hierarchy-urls []
+  (let [cl (.. Thread currentThread getContextClassLoader)]
+    (enumeration-seq (.getResources cl "duct_hierarchy.edn"))))
+
+(defn- derive-hierarchy [h]
+  (doseq [[tag parents] h, parent parents]
+    (derive tag parent))
+  h)
+
+(defn load-hierarchy
+  "Search the base classpath for files named `duct_hierarchy.edn`, and use them
+  to extend the global `derive` hierarchy. This allows a hierarchy to be
+  constructed without needing to load every namespace.
+
+  The `duct_hierarchy.edn` file should be an edn map that maps child keywords
+  to vectors of parents. For example:
+
+      {:example/child [:example/father :example/mother]}
+
+  This is equivalent to writing:
+
+      (derive :example/child :example/father)
+      (derive :example/child :example/mother)
+
+  This function should be called once when the application is started.
+
+  Rather than reading and building the hierarchy from the file system, this function
+  may take any number of hierarchy maps (of the same form expressed in
+  `duct_hierarchy.edn` files) from which to derive the global hierarchy. Note
+  that if hierarchy maps are provided as arguments, no `duct_hierarchy.edn`
+  files will be included.
+
+  Returns a map expressing the aggregate key hierarchies (a merge of the input
+  hierarchy files/maps)."
+  ([] (derive-hierarchy
+       (apply merge-configs
+              (for [url (hierarchy-urls)] (edn/read-string (slurp url))))))
+  ([h & more] (derive-hierarchy (apply merge-configs h more))))
 
 (defn- config-resource [path]
   (or (io/resource path)
@@ -105,7 +118,7 @@
 
   #duct/env
   : an environment variable, see [[duct.core.env/env]]
-  
+
   #duct/include
   : substitute for a configuration on the classpath
 
