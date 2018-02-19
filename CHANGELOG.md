@@ -1,3 +1,16 @@
+## 0.7.0-alpha1 (2017-02-07)
+
+* **BREAKING CHANGE** Redesigned modules to use their own config
+* **BREAKING CHANGE** Removed `prep` function
+* **BREAKING CHANGE** Removed `exec` function
+* **BREAKING CHANGE** Removed `:duct.core/include` key
+* Added `build-config` function
+* Added `fold-modules` function
+* Added `await-daemons` function
+* Added `:duct/profile` and child keys
+* Added `#duct/include` reader tag
+* Updated Integrant to 0.7.0-alpha1
+
 ## 0.6.2 (2017-12-17)
 
 * Updated dependencies
