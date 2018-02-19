@@ -198,6 +198,9 @@
     (instance? InertRefSet x) (ig/refset (:key x))
     :else x))
 
+(defmethod ig/prep-key :duct/module [_ profile]
+  (assoc profile ::requires (ig/refset :duct/profile)))
+
 (defmethod ig/init-key ::environment [_ env] env)
 
 (defmethod ig/init-key ::project-ns [_ ns] ns)
