@@ -190,14 +190,25 @@
 
 (defn await-daemons
   "If the supplied system has keys deriving from `:duct/daemon`, block the
-  current thread indefinitely and add a shutdown hook to halt the system.
-
-  This function is designed to be called from `-main` when standalone operation
-  is required."
+  current thread indefinitely and add a shutdown hook to halt the system."
   [system]
   (when (has-daemon? system)
     (add-shutdown-hook ::exec #(ig/halt! system))
     (.. Thread currentThread join)))
+
+(defn exec-config
+  "Build, prep and initiate a configuration of modules, then block the thread
+  (see [[await-daemons]]). By default it only runs profiles derived from
+  `:duct.profile/prod` and keys derived from `:duct/daemon`.
+
+  This function is designed to be called from `-main` when standalone operation
+  is required."
+  ([config]
+   (exec-config config [:duct.profile/prod]))
+  ([config profiles]
+   (exec-config config profiles [:duct/daemon]))
+  ([config profiles keys]
+   (-> config (prep-config profiles) (ig/init keys) (await-daemons))))
 
 (defrecord InertRef    [key])
 (defrecord InertRefSet [key])
