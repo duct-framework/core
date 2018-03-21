@@ -1,3 +1,9 @@
+## 0.7.0-alpha3 (2018-03-21)
+
+* Add `prep-config` function
+* Add `exec-config` function
+* Add `:all` argument to `profile-keys`
+
 ## 0.7.0-alpha2 (2018-02-19)
 
 * Ensured modules are applied after profiles

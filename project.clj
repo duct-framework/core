@@ -1,4 +1,4 @@
-(defproject duct/core "0.7.0-alpha2"
+(defproject duct/core "0.7.0-alpha3"
   :description "The core library for the Duct framework"
   :url "https://github.com/duct-framework/core"
   :license {:name "Eclipse Public License"
