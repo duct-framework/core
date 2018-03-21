@@ -1,8 +1,8 @@
-## 0.7.0-alpha2 (2017-02-19)
+## 0.7.0-alpha2 (2018-02-19)
 
 * Ensured modules are applied after profiles
 
-## 0.7.0-alpha1 (2017-02-07)
+## 0.7.0-alpha1 (2018-02-07)
 
 * **BREAKING CHANGE** Redesigned modules to use their own config
 * **BREAKING CHANGE** Removed `prep` function
