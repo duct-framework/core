@@ -72,7 +72,9 @@
            #{:duct.module/foo
              :duct.profile/base
              [:duct/profile ::x]
-             [:duct/profile ::y]}))))
+             [:duct/profile ::y]}))
+    (is (= (set (core/profile-keys m :all))
+           (set (keys m))))))
 
 (deftest test-parse-keys
   (is (= (seq (core/parse-keys [])) nil))
@@ -101,6 +103,17 @@
            {::a 2, ::b (ig/ref ::a), ::c (ig/refset ::b)}))
     (is (= (core/build-config m [:y])
            {::a 1, ::b (ig/ref ::a), ::d 3}))))
+
+(defmethod ig/prep-key ::prep [_ v] (inc v))
+
+(deftest test-prep-config
+  (let [m {:duct.profile/base  {::prep 1, ::a (ig/ref ::prep)}
+           [:duct/profile ::x] {::prep 2, ::b (ig/refset ::a)}
+           [:duct/profile ::y] {::c 3}}]
+    (is (= (core/prep-config m)
+           {::prep 3, ::a (ig/ref ::prep), ::b (ig/refset ::a), ::c 3}))
+    (is (= (core/prep-config m [::x])
+           {::prep 3, ::a (ig/ref ::prep), ::b (ig/refset ::a)}))))
 
 (deftest test-environment-keyword
   (let [m {::core/environment :development}]

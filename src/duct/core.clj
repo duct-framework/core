@@ -150,19 +150,35 @@
   "Return a collection of keys for a configuration that excludes any profile
   not present in the supplied colleciton of profiles. Profiles may be specified
   as namespaced keywords, or as un-namespaced keywords, in which case only the
-  name will matched (e.g. `:dev` will match `:duct.profile/dev`)."
+  name will matched (e.g. `:dev` will match `:duct.profile/dev`). If the :all
+  keyword is supplied instead of a profile collection, all keys are returned."
   [config profiles]
-  (filter (partial keep-key? profiles) (keys config)))
+  (cond->> (keys config)
+    (not= profiles :all) (filter (partial keep-key? profiles))))
 
 (defn build-config
   "Build an Integrant configuration from a configuration of modules. A
   collection of profile keys may optionally be supplied that govern which
-  profiles to use (see [[profile-keys]])."
+  profiles to use (see [[profile-keys]]). Omitting the profiles or using the
+  :all keyword in their stead will result in all keys being used."
   ([config]
-   (-> config ig/prep ig/init fold-modules))
+   (build-config config :all))
   ([config profiles]
    (let [keys (profile-keys config profiles)]
      (-> config ig/prep (ig/init keys) fold-modules))))
+
+(defn prep-config
+  "Load, build and prep a configuration of modules into an Integrant
+  configuration that's ready to be initiated. This function loads in relevant
+  namespaces based on key names, so is side-effectful (though idempotent)."
+  ([config]
+   (prep-config config :all))
+  ([config profiles]
+   (-> config
+       (doto ig/load-namespaces)
+       (build-config profiles)
+       (doto ig/load-namespaces)
+       (ig/prep))))
 
 (defn parse-keys
   "Parse config keys from a sequence of command line arguments."
