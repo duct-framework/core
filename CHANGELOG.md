@@ -1,3 +1,8 @@
+## 0.7.0-alpha4 (2018-04-10)
+
+* Added `:duct.profile/local` to hierarchy
+* Updated Integrant to 0.7.0-alpha2
+
 ## 0.7.0-alpha3 (2018-03-21)
 
 * Add `prep-config` function
