@@ -1,3 +1,8 @@
+## 0.7.0-alpha5 (2018-05-29)
+
+* Add boolean coercions to `#duct/env`
+* Add `:duct/const` keyword
+
 ## 0.7.0-alpha4 (2018-04-10)
 
 * Added `:duct.profile/local` to hierarchy
