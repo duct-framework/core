@@ -1,6 +1,8 @@
-{:duct.profile/base  [:duct/profile]
- :duct.profile/dev   [:duct/profile]
- :duct.profile/local [:duct/profile]
- :duct.profile/prod  [:duct/profile]
- :duct/server        [:duct/daemon]
- :duct.server/http   [:duct/server]}
+{:duct.profile/base     [:duct/profile]
+ :duct.profile/dev      [:duct/profile]
+ :duct.profile/local    [:duct/profile]
+ :duct.profile/prod     [:duct/profile]
+ :duct/server           [:duct/daemon]
+ :duct.server/http      [:duct/server]
+ :duct.core/environment [:duct/const]
+ :duct.core/project-ns  [:duct/const]}

@@ -116,10 +116,12 @@
            {::prep 3, ::a (ig/ref ::prep), ::b (ig/refset ::a)}))))
 
 (deftest test-environment-keyword
+  (core/load-hierarchy)
   (let [m {::core/environment :development}]
     (is (= m (ig/init m)))))
 
 (deftest test-project-ns-keyword
+  (core/load-hierarchy)
   (let [m {::core/project-ns 'foo}]
     (is (= m (ig/init m)))))
 

@@ -228,9 +228,7 @@
 (defmethod ig/prep-key :duct/module [_ profile]
   (assoc profile ::requires (ig/refset :duct/profile)))
 
-(defmethod ig/init-key ::environment [_ env] env)
-
-(defmethod ig/init-key ::project-ns [_ ns] ns)
+(defmethod ig/init-key :duct/const [_ v] v)
 
 (defmethod ig/init-key ::handler [_ {:keys [middleware router]}]
   ((apply comp (reverse middleware)) router))
