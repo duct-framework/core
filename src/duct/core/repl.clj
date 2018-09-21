@@ -6,3 +6,8 @@
   fipp/IOverride
   fipp/IEdn
   (-edn [r] (tagged-literal 'ig/ref (:key r))))
+
+(extend-type integrant.core.RefSet
+  fipp/IOverride
+  fipp/IEdn
+  (-edn [r] (tagged-literal 'ig/refset (:key r))))

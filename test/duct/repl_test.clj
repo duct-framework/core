@@ -5,5 +5,8 @@
             [integrant.core :as ig]))
 
 (deftest test-pprint
-  (is (= (with-out-str (fipp/pprint (ig/ref :duct.router/cascading)))
-         "#ig/ref :duct.router/cascading\n")))
+  (is (= (with-out-str (fipp/pprint
+                        {:a (ig/ref :duct.router/cascading)
+                         :b (ig/refset :duct/module)}))
+         (str "{:a #ig/ref :duct.router/cascading,"
+              " :b #ig/refset :duct/module}\n"))))
