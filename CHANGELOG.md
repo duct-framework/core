@@ -1,3 +1,8 @@
+## 0.7.0-alpha6 (2018-09-22)
+
+* Added `duct.core/resource` for better pretty-printing
+* Added pretty-printing for `integrant.core/refset`
+
 ## 0.7.0-alpha5 (2018-05-29)
 
 * Add boolean coercions to `#duct/env`
