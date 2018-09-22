@@ -8,6 +8,7 @@
             [clojure.string :as str]
             [duct.core.env :as env]
             [duct.core.merge :as merge]
+            [duct.core.resource :as resource]
             [integrant.core :as ig]
             [medley.core :as m]
             [clojure.walk :as walk]))
@@ -89,6 +90,15 @@
       (io/resource (str path ".edn"))
       (io/resource (str path ".clj"))))
 
+(defn resource
+  "Return an record that represents a resource on the classpath, compatible with
+  `clojure.java.io` functions like `reader`, `input-stream` and `as-url`. When
+  printed, the record returns a string tagged with `#duct/resource`. This makes
+  it more useful than a bare URL object when printing a configuration. If the
+  resource does not exist, `nil` is returned."
+  [path]
+  (resource/make-resource path))
+
 (defn- make-include [readers]
   #(some->> % config-resource slurp (ig/read-string {:readers readers})))
 
@@ -96,7 +106,7 @@
   (merge
    {'duct/env      env/env
     'duct/include  (make-include readers)
-    'duct/resource io/resource}
+    'duct/resource resource}
    readers))
 
 (defn read-config
@@ -110,7 +120,7 @@
   : substitute for a configuration on the classpath
 
   #duct/resource
-  : a resource path string, see clojure.java.io/resource
+  : a resource path string, see [[resource]]
 
   #ig/ref
   : an Integrant reference to another key
