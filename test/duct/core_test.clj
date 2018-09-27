@@ -46,7 +46,7 @@
 (deftest test-read-config
   (is (= (core/read-config (io/resource "duct/readers.edn") {'custom/bar (fn [x] {:x x})})
          {:foo/a {:x "bar"}
-          :foo/b {:bar/a {:x 1}, :bar/b (ig/ref :bar/a)}
+          :foo/b {:bar/a {:x 1}, :bar/b (ig/ref :bar/a) :bar/c {:baz/a {:x 1}}}
           :foo/c (core/resource "duct/config.edn")
           :foo/d (ig/ref :foo/a)
           :foo/e (ig/refset :foo/b)})))

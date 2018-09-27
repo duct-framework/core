@@ -99,8 +99,12 @@
   [path]
   (resource/make-resource path))
 
+(declare merge-default-readers)
+
 (defn- make-include [readers]
-  #(some->> % config-resource slurp (ig/read-string {:readers readers})))
+  (fn [path]
+    (let [opts {:readers (merge-default-readers readers)}]
+      (some->> path config-resource slurp (ig/read-string opts)))))
 
 (defn- merge-default-readers [readers]
   (merge
