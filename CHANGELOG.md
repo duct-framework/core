@@ -1,3 +1,7 @@
+## 0.7.0-alpha7 (2018-09-27)
+
+* Fixed included configurations not having default tags (#16)
+
 ## 0.7.0-alpha6 (2018-09-22)
 
 * Added `duct.core/resource` for better pretty-printing
