@@ -1,3 +1,8 @@
+## 0.7.0-alpha8 (2018-09-28)
+
+* **BREAKING CHANGE** Removed `:duct.core/handler` key
+* Updated Integrant to 0.7.0
+
 ## 0.7.0-alpha7 (2018-09-27)
 
 * Fixed included configurations not having default tags (#16)
