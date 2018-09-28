@@ -125,15 +125,6 @@
   (let [m {::core/project-ns 'foo}]
     (is (= m (ig/init m)))))
 
-(deftest test-handler-keyword
-  (let [m {::core/handler
-           {:router     (fn [_] {:status 200, :headers {}, :body "foo"})
-            :middleware [(fn [f] #(assoc-in (f %) [:headers "X-Foo"] "bar"))
-                         (fn [f] #(assoc-in (f %) [:headers "X-Foo"] "baz"))]}}
-        f (::core/handler (ig/init m))]
-    (is (= (f {:request-method :get, :uri "/"})
-           {:status 200, :headers {"X-Foo" "baz"}, :body "foo"}))))
-
 (deftest test-profile-dev-keyword
   (core/load-hierarchy)
   (let [m {:duct.profile/base {::a 1, ::b (ig/ref ::a)}

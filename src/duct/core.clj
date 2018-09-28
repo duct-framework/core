@@ -244,9 +244,6 @@
 
 (defmethod ig/init-key :duct/const [_ v] v)
 
-(defmethod ig/init-key ::handler [_ {:keys [middleware router]}]
-  ((apply comp (reverse middleware)) router))
-
 (defmethod ig/prep-key :duct/profile [_ profile]
   (-> (walk/postwalk deactivate-ref profile)
       (assoc ::requires (ig/ref :duct.profile/base))))
