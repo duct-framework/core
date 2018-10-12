@@ -18,3 +18,23 @@
                (env/coerce "abc" 'Int)))
   (is (thrown? ExceptionInfo
                (env/coerce "tru" 'Bool))))
+
+(deftest env
+  (binding [env/*env* {"INTEGER"       "2000"
+                       "STRING"        "a string"
+                       "BOOLEAN_TRUE"  "true"
+                       "BOOLEAN_FALSE" "false"}]
+    (are [v expected] (= expected (env/env v))
+      '["UNDEFINED" Int]                nil
+      '["UNDEFINED" Int :or 3001]       3001
+      '["INTEGER" Int]                  2000
+      '["INTEGER" Int :or 3002]         2000
+      '["UNDEFINED" Bool]               nil
+      '["UNDEFINED" Bool :or true]      true
+      '["UNDEFINED" Bool :or false]     false
+      '["BOOLEAN_TRUE" Bool]            true
+      '["BOOLEAN_TRUE" Bool :or true]   true
+      '["BOOLEAN_TRUE" Bool :or false]  true
+      '["BOOLEAN_FALSE" Bool]           false
+      '["BOOLEAN_FALSE" Bool :or true]  false
+      '["BOOLEAN_FALSE" Bool :or false] false)))

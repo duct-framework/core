@@ -22,6 +22,9 @@
                          "\"yes\", \"y\", \"no\", \"n\", \"\" or nil.")
                     {:value x, :coercion 'Bool}))))
 
+(def ^:dynamic *env*
+  (into {} (System/getenv)))
+
 (defn env
   "Resolve an environment variable by name. Optionally accepts a type for
   coercion, and a keyword option, `:or`, that provides a default value if the
@@ -34,11 +37,12 @@
   ([name]
    (if (vector? name)
      (apply env name)
-     (System/getenv name)))
+     (*env* name)))
   ([name type & options]
    (if (keyword? type)
      (apply env name 'Str type options)
-     (let [{default :or} options]
-       (-> (System/getenv name)
-           (some-> (coerce type))
-           (or default))))))
+     (let [{default :or} options
+           value (*env* name)]
+       (if (nil? value)
+         default
+         (coerce value type))))))
