@@ -88,7 +88,7 @@
     (is (= p
            {:duct.profile/base  {::a 1, ::b (core/->InertRef ::a)}
             [:duct/profile ::x] {::a 2, ::c (core/->InertRefSet ::b)
-                                 ::core/requires (ig/ref :duct.profile/base)}}))
+                                 ::core/requires (ig/refset :duct.profile/base)}}))
     (is (= (core/fold-modules (ig/init p))
            {::a 2, ::b (ig/ref ::a), ::c (ig/refset ::b)}))))
 
@@ -113,7 +113,9 @@
     (is (= (core/prep-config m)
            {::prep 3, ::a (ig/ref ::prep), ::b (ig/refset ::a), ::c 3}))
     (is (= (core/prep-config m [::x])
-           {::prep 3, ::a (ig/ref ::prep), ::b (ig/refset ::a)}))))
+           {::prep 3, ::a (ig/ref ::prep), ::b (ig/refset ::a)}))
+    (is (= (core/prep-config (assoc m [:duct.profile/base ::z] {::c 1, ::d 4}))
+           {::prep 3, ::a (ig/ref ::prep), ::b (ig/refset ::a), ::c 3, ::d 4}))))
 
 (deftest test-environment-keyword
   (core/load-hierarchy)
@@ -133,7 +135,7 @@
     (is (= p
            {:duct.profile/base {::a 1, ::b (core/->InertRef ::a)}
             :duct.profile/dev  {::a 2, ::c (core/->InertRefSet ::b)
-                                ::core/requires (ig/ref :duct.profile/base)
+                                ::core/requires (ig/refset :duct.profile/base)
                                 ::core/environment :development}}))
     (is (= (core/fold-modules (ig/init p))
            {::a 2, ::b (ig/ref ::a), ::c (ig/refset ::b)
@@ -147,7 +149,7 @@
     (is (= p
            {:duct.profile/base {::a 1, ::b (core/->InertRef ::a)}
             :duct.profile/prod {::a 2, ::c (core/->InertRefSet ::b)
-                                ::core/requires (ig/ref :duct.profile/base)
+                                ::core/requires (ig/refset :duct.profile/base)
                                 ::core/environment :production}}))
     (is (= (core/fold-modules (ig/init p))
            {::a 2, ::b (ig/ref ::a), ::c (ig/refset ::b)

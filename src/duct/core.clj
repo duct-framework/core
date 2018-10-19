@@ -244,9 +244,10 @@
 
 (defmethod ig/init-key :duct/const [_ v] v)
 
-(defmethod ig/prep-key :duct/profile [_ profile]
+(defmethod ig/prep-key :duct/profile [k profile]
   (-> (walk/postwalk deactivate-ref profile)
-      (assoc ::requires (ig/ref :duct.profile/base))))
+      (cond-> (not (isa? k :duct.profile/base))
+        (assoc ::requires (ig/refset :duct.profile/base)))))
 
 (defmethod ig/init-key :duct/profile [_ profile]
   (let [profile (walk/postwalk activate-ref (dissoc profile ::requires))]
