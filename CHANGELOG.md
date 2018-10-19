@@ -1,3 +1,7 @@
+## 0.7.0-beta1 (2018-10-19)
+
+* Fixed issue with multiple `:duct.profile/base` keys (duct-framework/duct#77)
+
 ## 0.7.0-alpha8 (2018-09-28)
 
 * **BREAKING CHANGE** Removed `:duct.core/handler` key
