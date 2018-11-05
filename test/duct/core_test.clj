@@ -41,7 +41,11 @@
     {::a [:x :y]}          {::a [:y :z]}                 {::a [:x :y :y :z]}
     {::a [:x :y]}          {::a ^:distinct [:y :z]}      {::a [:x :y :z]}
     {::a {:x 1}}           {::a ^:demote {:x 2, :y 3}}   {::a {:x 1, :y 3}}
-    {::a ^:promote {:x 1}} {::a {:x 2, :y 3}}            {::a {:x 1, :y 3}}))
+    {::a ^:promote {:x 1}} {::a {:x 2, :y 3}}            {::a {:x 1, :y 3}}
+    {::a (ig/ref ::b)}     {::a {:x 1}}                  {::a {:x 1}}
+    {::a {:x 1}}           {::a (ig/ref ::b)}            {::a (ig/ref ::b)}
+    {::a (ig/refset ::b)}  {::a {:x 1}}                  {::a {:x 1}}
+    {::a {:x 1}}           {::a (ig/refset ::b)}         {::a (ig/refset ::b)}))
 
 (deftest test-read-config
   (is (= (core/read-config (io/resource "duct/readers.edn") {'custom/bar (fn [x] {:x x})})

@@ -71,10 +71,10 @@
              (-> left meta* (dissoc :replace))))))
 
 (defn- demote? [obj]
-  (-> obj meta :demote))
+  (-> obj meta* :demote))
 
 (defn- promote? [obj]
-  (-> obj meta :promote))
+  (-> obj meta* :promote))
 
 (defn- prepend? [obj]
   (-> obj meta :prepend))
@@ -92,22 +92,26 @@
 (defn meta-merge
   "Recursively merge values based on the information in their metadata."
   [left right]
-  (cond
-    (different-priority? left right)
-    (pick-prioritized left right)
+  (let [[left right] (if (or (promote? left) (demote? right))
+                       [right left]
+                       [left right])]
+    (cond
+      (different-priority? left right)
+      (pick-prioritized left right)
 
-    (and (map? left) (map? right))
-    (if (or (promote? left) (demote? right))
-      (merge-with meta-merge right left)
-      (merge-with meta-merge left right))
+      (or (ig/reflike? left) (ig/reflike? right))
+      right
 
-    (and (set? left) (set? right))
-    (set/union right left)
+      (and (map? left) (map? right))
+      (merge-with meta-merge left right)
 
-    (and (coll? left) (coll? right))
-    (if (or (prepend? left) (prepend? right))
-      (-> (meta-concat right left)
-          (with-meta (merge (meta left) (select-keys (meta right) [:displace]))))
-      (meta-concat left right))
+      (and (set? left) (set? right))
+      (set/union right left)
 
-    :else right))
+      (and (coll? left) (coll? right))
+      (if (or (prepend? left) (prepend? right))
+        (-> (meta-concat right left)
+            (with-meta (merge (meta left) (select-keys (meta right) [:displace]))))
+        (meta-concat left right))
+
+      :else right)))
