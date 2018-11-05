@@ -1,3 +1,8 @@
+## 0.7.0-beta2 (2018-11-05)
+
+* Fixed default value for boolean env vars (#17)
+* Fixed refs and refsets not being atomic when merging (#8)
+
 ## 0.7.0-beta1 (2018-10-19)
 
 * Fixed issue with multiple `:duct.profile/base` keys (duct-framework/duct#77)
