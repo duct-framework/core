@@ -3,10 +3,10 @@
   :url "https://github.com/duct-framework/core"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.9.0"]
+  :dependencies [[org.clojure/clojure "1.10.0"]
                  [integrant "0.7.0"]
                  [medley "1.0.0"]
-                 [fipp "0.6.12"]]
+                 [fipp "0.6.14"]]
   :plugins [[lein-codox "0.10.3"]]
   :codox {:output-path "codox"
           :project  {:name "Duct core"}
