@@ -1,3 +1,7 @@
+## 0.7.0 (2018-01-05)
+
+* Updated dependencies
+
 ## 0.7.0-beta2 (2018-11-05)
 
 * Fixed default value for boolean env vars (#17)
