@@ -2,4 +2,5 @@
  :foo/b #duct/include "duct/config.edn"
  :foo/c #duct/resource "duct/config.edn"
  :foo/d #ig/ref :foo/a
- :foo/e #ig/refset :foo/b}
+ :foo/e #ig/refset :foo/b
+ :foo/f #duct/regex "baz"}
