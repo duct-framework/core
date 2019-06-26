@@ -8,6 +8,8 @@
                  [medley "1.0.0"]
                  [fipp "0.6.14"]]
   :plugins [[lein-codox "0.10.3"]]
+  :profiles {:provided {:dependencies [[hawk "0.2.11"]
+                                       [integrant/repl "0.3.1"]]}}
   :codox {:output-path "codox"
           :project  {:name "Duct core"}
           :html     {:namespace-list :flat}
