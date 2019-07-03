@@ -29,7 +29,7 @@ resource:
 ```
 
 Once we have a configuration, we have three options. The first option
-is to `prep` the configuration, which will load in all relevant
+is to `prep-config` the configuration, which will load in all relevant
 namespaces and apply all modules.
 
 This is ideally used with `integrant.repl`:
@@ -37,17 +37,17 @@ This is ideally used with `integrant.repl`:
 ```clojure
 (require '[integrant.repl :refer :all])
 
-(set-prep! #(duct/prep (get-config)))
+(set-prep! #(duct/prep-config (get-config)))
 ```
 
-Alternatives we can `prep` then `exec` the configuration. This
+Alternatives we can `prep-config` then `exec-config` the configuration. This
 initiates the configuration, then blocks the current thread if the
 system includes any keys deriving from `:duct/daemon`. This is
 designed to be used from the `-main` function:
 
 ```clojure
 (defn -main []
-  (-> (get-config) (duct/prep) (duct/exec)))
+  (-> (get-config) (duct/prep-config) (duct/exec-config)))
 ```
 
 You can change the executed keys to anything you want by adding in an
@@ -58,8 +58,8 @@ function, which parses keywords from command-line arguments:
 (defn -main [& args]
   (let [keys (or (duct/parse-keys args) [:duct/daemon])]
     (-> (get-config)
-        (duct/prep keys)
-        (duct/exec keys))))
+        (duct/prep-config keys)
+        (duct/exec-config keys))))
 ```
 
 This allows other parts of the system to be selectively executed. For
