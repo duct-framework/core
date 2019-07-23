@@ -53,7 +53,20 @@
           :foo/b {:bar/a {:x 1}, :bar/b (ig/ref :bar/a) :bar/c {:baz/a {:x 1}}}
           :foo/c (core/resource "duct/config.edn")
           :foo/d (ig/ref :foo/a)
-          :foo/e (ig/refset :foo/b)})))
+          :foo/e (ig/refset :foo/b)
+          :foo/f (merge/displace 1)
+          :foo/g (merge/replace [1 2])})))
+
+(deftest test-merge-readers
+  (let [conf (core/read-config (io/resource "duct/readers.edn") {'custom/bar (fn [x] {:x x})})]
+    (is (= (core/merge-configs {:foo/f 2 :foo/g [3 4]} conf)
+           {:foo/a {:x "bar"}
+            :foo/b {:bar/a {:x 1}, :bar/b (ig/ref :bar/a) :bar/c {:baz/a {:x 1}}}
+            :foo/c (core/resource "duct/config.edn")
+            :foo/d (ig/ref :foo/a)
+            :foo/e (ig/refset :foo/b)
+            :foo/f 2
+            :foo/g [1 2]}))))
 
 (defmethod ig/init-key ::foo [_ {:keys [x]}]
   #(update % ::x (fnil conj []) x))

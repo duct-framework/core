@@ -110,7 +110,9 @@
   (merge
    {'duct/env      env/env
     'duct/include  (make-include readers)
-    'duct/resource resource}
+    'duct/resource resource
+    'duct/displace merge/displace
+    'duct/replace  merge/replace}
    readers))
 
 (defn read-config
@@ -119,7 +121,7 @@
 
   #duct/env
   : an environment variable, see [[duct.core.env/env]]
-  
+
   #duct/include
   : substitute for a configuration on the classpath
 
