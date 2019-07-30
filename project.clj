@@ -5,10 +5,10 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [integrant "0.7.0"]
-                 [medley "1.0.0"]
-                 [fipp "0.6.14"]]
+                 [medley "1.0.0"]]
   :plugins [[lein-codox "0.10.3"]]
-  :profiles {:provided {:dependencies [[hawk "0.2.11"]
+  :profiles {:provided {:dependencies [[fipp "0.6.14"]
+                                       [hawk "0.2.11"]
                                        [integrant/repl "0.3.1"]]}}
   :codox {:output-path "codox"
           :project  {:name "Duct core"}
