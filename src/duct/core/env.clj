@@ -10,6 +10,9 @@
 (defmethod coerce 'Int [x _]
   (Long/parseLong x))
 
+(defmethod coerce 'Double [x _]
+  (Double/parseDouble x))
+
 (defmethod coerce 'Str [x _]
   (str x))
 
