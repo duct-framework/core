@@ -117,7 +117,7 @@
 
 (defn read-config
   "Read an edn configuration from a slurpable source. An optional map of data
-  readers may be supplied. By default the following five readers are supported:
+  readers may be supplied. By default the following readers are supported:
 
   #duct/env
   : an environment variable, see [[duct.core.env/env]]
@@ -127,6 +127,12 @@
 
   #duct/resource
   : a resource path string, see [[resource]]
+
+  #duct/displace
+  : equivalent to the metadata tag `^:displace`, but works on primative values
+
+  #duct/replace
+  : equivalent to the metadata tag `^:replace`, but works on primative values
 
   #ig/ref
   : an Integrant reference to another key
