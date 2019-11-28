@@ -1,3 +1,12 @@
+## 0.8.0 (2019-11-28)
+
+* Added `#duct/displace` and `#duct/replace` readers
+* Added `duct.core.repl/auto-reset` function
+* Added `:duct.profile/test`
+* Added `Double` coercion for environment
+* Made Fipp a provided dependency
+* Updated dependencies
+
 ## 0.7.0 (2018-01-05)
 
 * Updated dependencies
