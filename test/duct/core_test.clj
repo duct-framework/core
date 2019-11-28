@@ -158,6 +158,20 @@
            {::a 2, ::b (ig/ref ::a), ::c (ig/refset ::b)
             ::core/environment :development}))))
 
+(deftest test-profile-test-keyword
+  (core/load-hierarchy)
+  (let [m {:duct.profile/base {::a 1, ::b (ig/ref ::a)}
+           :duct.profile/test {::a 2, ::c (ig/refset ::b)}}
+        p (ig/prep m)]
+    (is (= p
+           {:duct.profile/base {::a 1, ::b (core/->InertRef ::a)}
+            :duct.profile/test {::a 2, ::c (core/->InertRefSet ::b)
+                                ::core/requires (ig/refset :duct.profile/base)
+                                ::core/environment :test}}))
+    (is (= (core/fold-modules (ig/init p))
+           {::a 2, ::b (ig/ref ::a), ::c (ig/refset ::b)
+            ::core/environment :test}))))
+
 (deftest test-profile-prod-keyword
   (core/load-hierarchy)
   (let [m {:duct.profile/base {::a 1, ::b (ig/ref ::a)}

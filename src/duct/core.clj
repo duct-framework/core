@@ -268,6 +268,10 @@
   (-> (ig/prep-key :duct/profile profile)
       (assoc ::environment :development)))
 
+(defmethod ig/prep-key :duct.profile/test [_ profile]
+  (-> (ig/prep-key :duct/profile profile)
+      (assoc ::environment :test)))
+
 (defmethod ig/prep-key :duct.profile/prod [_ profile]
   (-> (ig/prep-key :duct/profile profile)
       (assoc ::environment :production)))
