@@ -92,12 +92,6 @@ project. This is often used by modules for determining where to put
 things. For example, public web resources are typically placed in the
 `resources/<project-ns>/public` directory.
 
-`:duct.core/include` specifies a vector of resource paths that contain
-configurations that will be merged into the base configuration
-map. Data in the base configuration always takes priority over the
-included resources. The file extension may be omitted from the
-resource paths.
-
 `:duct.core/handler` should be configured with a map with two keys:
 `:router`, which should be a Ring handler, and `:middleware`, which
 should be an ordered vector of middleware. The middleware is applied
