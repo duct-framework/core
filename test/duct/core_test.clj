@@ -74,6 +74,12 @@
 (defmethod ig/init-key ::bar [_ {:keys [x]}]
   #(update % ::x (fnil conj []) x))
 
+(defmethod ig/init-key ::module [_ {:route/keys [resource]}]
+  #(assoc % ::foo resource))
+
+(defmethod ig/init-key ::inc [_ v]
+  (inc v))
+
 (deftest test-fold-modules
   (let [m {::foo {:x 1}, ::bar {:x 2, :r (ig/ref ::foo)}}]
     (is (= (core/fold-modules (ig/init m))
@@ -185,3 +191,17 @@
     (is (= (core/fold-modules (ig/init p))
            {::a 2, ::b (ig/ref ::a), ::c (ig/refset ::b)
             ::core/environment :production}))))
+
+(deftest test-module-key
+  (core/load-hierarchy)
+  (let [m {:duct.profile/base {}
+           ::module {:route/resource :person}}
+        p (duct.core/prep-config m)]
+    (is (= :person (::foo p)))))
+
+(deftest test-non-module-key-exception
+  (core/load-hierarchy)
+  (let [m {:duct.profile/base {}
+           ::inc 123}
+        p (try (duct.core/prep-config m) (catch Exception e (ex-data e)))]
+    (is (= {:key ::inc} p))))

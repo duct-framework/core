@@ -144,12 +144,21 @@
   ([source readers]
    (some->> source slurp (ig/read-string {:readers (merge-default-readers readers)}))))
 
+(defn- validate-module-function [k f]
+  (when-not (fn? f)
+    (throw (ex-info (str "Module with init-key " k " is not a function. Module "
+                         "init-keys should always be a function that accepts a "
+                         "config map and returns a config map.")
+                    {:key k}))))
+
 (defn fold-modules
   "Fold a system map of modules into an Integrant configuration. A module is a
   pure function that transforms a configuration map. The modules are traversed
   in dependency order and applied to iteratively to a blank map in order to
   build the final configuration."
   [system]
+  (doseq [[k f] system]
+    (validate-module-function k f))
   (ig/fold system (fn [m _ f] (f m)) {}))
 
 (defn- matches-name? [key profile-key]
