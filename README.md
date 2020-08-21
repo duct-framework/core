@@ -81,82 +81,92 @@ example.
 
 ## Keys
 
-This library introduces four Integrant keys.
+This library introduces a number of Integrant components:
 
-`:duct.core/environment` specifies the environment of the
-configuration, and may be set to `:development` or `:production`. It
-does nothing on its own, but may be used by modules.
+* `:duct/const` is a component that returns its value when initialized.
+* `:duct/module` denotes a Duct module (see the modules section).
+* `:duct/profile` denotes a Duct profile (see the profiles section).
+* `:duct.core/environment` specifies the environment of the
+  configuration, and may be set to `:development` or `:production`. It
+  does nothing on its own, but may be used by modules.
+* `:duct.core/project-ns` specifies the base namespace of your
+  project. This is often used by modules for determining where to put
+  things. For example, public web resources are typically placed in the
+  `resources/<project-ns>/public` directory.
 
-`:duct.core/project-ns` specifies the base namespace of your
-project. This is often used by modules for determining where to put
-things. For example, public web resources are typically placed in the
-`resources/<project-ns>/public` directory.
+## Readers
 
-`:duct.core/handler` should be configured with a map with two keys:
-`:router`, which should be a Ring handler, and `:middleware`, which
-should be an ordered vector of middleware. The middleware is applied
-to the router to create a completed Ring handler.
+This library also introduces five new reader tags that can be used in
+Duct configurations:
 
-In addition, it sets up some deriviations:
-
-* `:duct.server/http` derives from `:duct/server`
-* `:duct/server` derives from `:duct/daemon`
+* `#duct/env "VARNAME"` allows an environment variable to be
+  referenced in the configuration.
+* `#duct/include "path"` will include replace the tag with the
+  resource at the specified path. This allows a configuration to be
+  split up into separate files.
+* `#duct/resource "path"` will convert a resource path into a URL
+* `#duct/displace` is equivalent to `^:displace`, but works with
+  primitive values
+* `#duct/replace` is equivalent to `^:replace`, but works with
+  primitive values
 
 ## Modules
 
-Modules are Integrant keywords that derive from `:duct/module`, and
-initiate into maps with two keys: `:req` and `:fn`. The `:req` key is
-optional, and should contain a collection of keys that are required to
-be present in the map. The `:fn` key is a pure function that
-transforms the configuration into a new configuration.
+Modules are Integrant components that initialize into a pure
+function. This function expects a configuration as its argument, and
+returns a modified configuration.
 
-The `:fn` **must** be pure, and **must never** remove top-level keys
-from the configuration. A module should add functionality to a
-configuration; it should not override or remove existing functionality
-supplied by the user.
+Most modules derive from `:duct/module`. This both identifies them,
+and ensures they are executed after profiles.
 
-Here's an example module:
+Here's a simple example module:
 
 ```clojure
 (require '[integrant.core :as ig])
 
 (derive :duct.module/example :duct/module)
 
-(defmethod ig/init-key :duct.module/example [_ port]
-  {:req #{:duct.server.http/jetty}
-   :fn  (fn [config]
-          (assoc-in config [:duct.server.http/jetty :port] port))})
+(defmethod ig/init-key :duct.module/example [_ {:keys [port]}]
+  (fn [config]
+    (assoc-in config [:duct.server.http/jetty :port] port)))
 ```
 
 This above module updates the port number of the `:duct.server.http/jetty`
-key. Note that this key is a requirement; we need it to exist for the
-module to run. The module requirements are used for ordering modules,
-and for ensuring their basic pre-requisites are met.
+key. By itself this isn't hugely useful, but modules can be made to
+update many different components at once.
 
-In the previous example we used `assoc-in`, but the `duct.core`
-namespace also has a `merge-configs` function we can use to achieve a
-similar result in a smarter way:
+Modules can also have dependencies, achieved using
+`integrant.core/prep-key`:
 
 ```clojure
-(require '[duct.core.merge :as merge])
-
-(defmethod ig/init-key :duct.module/example [_ port]
-  {:req #{:duct.server/http}
-   :fn  (fn [config]
-          (duct/merge-configs
-           config
-           {:duct.server/http {:port (merge/displace port)}}))})
+(defmethod ig/prep-key :duct.module/example [_ options]
+  (assoc options ::requires (ig/ref :duct.module/parent)))
 ```
 
-In this example we've changed the requirement from
-`:duct.server.http/jetty` to the more generic `:duct.server/http`,
-which the latter derives from. The `merge-configs` function is smart
-enough to merge `:duct.server/http` into a more specific derived key,
-if one exists.
+This adds a reference to the module's options, ensuring that Integrant
+will initialize the `:duct.module/parent` module before
+`:duct.module/example`.
 
-We've also added merge metadata using `merge/displace`. This tells
-`merge-configs` not to override the port if it already exists in the
-configuraton.
+You can also have optional dependencies with `integrant.core/refset`:
+
+```clojure
+(defmethod ig/prep-key :duct.module/example [_ options]
+  (assoc options ::requires (ig/refset #{:duct.module/parent})))
+```
+
+## Profiles
+
+A profile is (currently) a type of module that merges the value of the
+key into the resulting configuration.
+
+There are five profile keys included in this library:
+
+* `:duct.profile/base` is the base of all new profiles
+* `:duct.profile/dev` is a profile for development
+* `:duct.profile/local` is a profile only on your local development
+  machine
+* `:duct.profile/test` is a profile for testing
+* `:duct.profile/prod` is a profile for production
 
 ## Documentation
 
@@ -164,7 +174,7 @@ configuraton.
 
 ## License
 
-Copyright © 2017 James Reeves
+Copyright © 2020 James Reeves
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
