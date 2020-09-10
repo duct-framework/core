@@ -40,7 +40,7 @@ This is ideally used with `integrant.repl`:
 (set-prep! #(duct/prep-config (get-config)))
 ```
 
-Alternatives we can `prep-config` then `exec-config` the configuration. This
+Alternatively we can `prep-config` then `exec-config` the configuration. This
 initiates the configuration, then blocks the current thread if the
 system includes any keys deriving from `:duct/daemon`. This is
 designed to be used from the `-main` function:
