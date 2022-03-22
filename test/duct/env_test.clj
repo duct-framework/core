@@ -14,7 +14,8 @@
     "t"    'Bool   true
     ""     'Bool   false
     "no"   'Bool   false
-    nil    'Bool   false)
+    nil    'Bool   false
+    "foo"  'Keyword :foo)
   (is (thrown? IllegalArgumentException
                (env/coerce "abc" 'Int)))
   (is (thrown? NumberFormatException
