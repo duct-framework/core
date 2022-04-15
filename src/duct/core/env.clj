@@ -16,6 +16,9 @@
 (defmethod coerce 'Str [x _]
   (str x))
 
+(defmethod coerce 'Keyword [x _]
+  (keyword x))
+
 (defmethod coerce 'Bool [x _]
   (case (some-> x str/lower-case)
     ("true" "t" "yes" "y") true
