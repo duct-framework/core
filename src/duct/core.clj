@@ -4,13 +4,10 @@
   (:require [clojure.core :as core]
             [clojure.edn :as edn]
             [clojure.java.io :as io]
-            [clojure.set :as set]
-            [clojure.string :as str]
             [duct.core.env :as env]
             [duct.core.merge :as merge]
             [duct.core.resource :as resource]
             [integrant.core :as ig]
-            [medley.core :as m]
             [clojure.walk :as walk]))
 
 (def target-path
