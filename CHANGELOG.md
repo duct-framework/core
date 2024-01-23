@@ -1,3 +1,7 @@
+## 0.8.1 (2024-01-23)
+
+* Removed unused Medley dependency (#43)
+
 ## 0.8.0 (2019-11-28)
 
 * Added `#duct/displace` and `#duct/replace` readers
